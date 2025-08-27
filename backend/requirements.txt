@@ -1,0 +1,10 @@
+Flask
+Flask-CORS
+opencv-python
+deepface
+spotipy
+SQLAlchemy
+Flask-SQLAlchemy
+Pillow
+python-dotenv
+tensorflow
