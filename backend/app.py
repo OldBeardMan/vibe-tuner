@@ -6,22 +6,24 @@ from models.database import db
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
-    
+
     # Initialize extensions
     db.init_app(app)
     CORS(app)
-    
+
     # Register blueprints
+    from routes.auth_routes import auth_bp
     from routes.emotion_routes import emotion_bp
     from routes.analytics_routes import analytics_bp
-    
+
+    app.register_blueprint(auth_bp, url_prefix='/api')
     app.register_blueprint(emotion_bp, url_prefix='/api')
     app.register_blueprint(analytics_bp, url_prefix='/api')
-    
+
     # Create tables
     with app.app_context():
         db.create_all()
-    
+
     return app
 
 if __name__ == '__main__':

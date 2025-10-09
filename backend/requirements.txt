@@ -8,3 +8,5 @@ Flask-SQLAlchemy
 Pillow
 python-dotenv
 tensorflow
+PyJWT
+psycopg2-binary

@@ -10,100 +10,78 @@ class SpotifyService:
             client_secret=Config.SPOTIFY_CLIENT_SECRET
         )
         self.spotify = spotipy.Spotify(client_credentials_manager=self.client_credentials_manager)
-        
-        # Emotion to genre/mood mapping
-        self.emotion_genres = {
-            'happy': ['pop', 'dance', 'funk', 'disco', 'electronic'],
-            'sad': ['blues', 'indie', 'alternative', 'acoustic', 'folk'],
-            'angry': ['rock', 'metal', 'punk', 'hard rock', 'grunge'],
-            'surprised': ['electronic', 'experimental', 'techno', 'ambient'],
-            'neutral': ['ambient', 'chill', 'lo-fi', 'indie', 'alternative'],
-            'fear': ['dark ambient', 'industrial', 'gothic', 'doom'],
-            'disgust': ['experimental', 'noise', 'industrial']
-        }
-        
-        # Emotion to audio features
-        self.emotion_features = {
-            'happy': {'valence': (0.6, 1.0), 'energy': (0.5, 1.0), 'danceability': (0.5, 1.0)},
-            'sad': {'valence': (0.0, 0.4), 'energy': (0.0, 0.5), 'acousticness': (0.3, 1.0)},
-            'angry': {'valence': (0.0, 0.5), 'energy': (0.7, 1.0), 'loudness': (-10, 0)},
-            'surprised': {'valence': (0.4, 0.8), 'energy': (0.6, 1.0)},
-            'neutral': {'valence': (0.3, 0.7), 'energy': (0.3, 0.7)},
-            'fear': {'valence': (0.0, 0.3), 'energy': (0.2, 0.6)},
-            'disgust': {'valence': (0.0, 0.3), 'energy': (0.3, 0.7)}
+
+        # Pre-created playlists mapping (7 playlists for 7 emotions)
+        # TODO: Replace these IDs with actual Spotify playlist IDs
+        self.emotion_playlists = {
+            'happy': '37i9dQZF1DXdPec7aLTmlC',      # Happy Hits
+            'sad': '37i9dQZF1DX7qK8ma5wgG1',        # Sad Indie
+            'angry': '37i9dQZF1DX4pUKG1kS0Ac',      # Rock Classics
+            'surprise': '37i9dQZF1DWZd79rJ6a7lp',   # Electronic Hits
+            'neutral': '37i9dQZF1DX4sWSpwq3LiO',    # Peaceful Piano
+            'fear': '37i9dQZF1DX4pUKG1kS0Ac',       # Dark & Stormy
+            'disgust': '37i9dQZF1DX0XUsuxWHRQd'     # RapCaviar
         }
     
     def get_playlist_for_emotion(self, emotion):
+        """
+        Get pre-created Spotify playlist for given emotion
+        Fetches playlist details from Spotify API
+        """
         try:
             if not self.spotify:
                 return None
-            
-            # Get genres for this emotion
-            genres = self.emotion_genres.get(emotion, ['pop'])
-            selected_genre = random.choice(genres)
-            
-            # Search for tracks
-            query = f'genre:{selected_genre}'
-            results = self.spotify.search(
-                q=query, 
-                type='track', 
-                limit=20,
-                market='US'
-            )
-            
-            if not results['tracks']['items']:
-                # Fallback search without genre
-                results = self.spotify.search(
-                    q=f'mood {emotion}',
-                    type='track',
-                    limit=20,
-                    market='US'
-                )
-            
+
+            # Get playlist ID for emotion
+            playlist_id = self.emotion_playlists.get(emotion)
+
+            if not playlist_id:
+                return None
+
+            # Fetch playlist details from Spotify
+            playlist = self.spotify.playlist(playlist_id)
+
+            # Get tracks from playlist
             tracks = []
-            for track in results['tracks']['items'][:10]:
-                tracks.append({
-                    'name': track['name'],
-                    'artist': track['artists'][0]['name'],
-                    'spotify_id': track['id'],
-                    'preview_url': track.get('preview_url'),
-                    'external_url': track['external_urls']['spotify']
-                })
-            
-            playlist = {
-                'name': f'{emotion.title()} Vibes',
+            for item in playlist['tracks']['items'][:20]:  # Limit to 20 tracks
+                if item['track']:
+                    track = item['track']
+                    tracks.append({
+                        'name': track['name'],
+                        'artist': track['artists'][0]['name'] if track['artists'] else 'Unknown',
+                        'spotify_id': track['id'],
+                        'preview_url': track.get('preview_url'),
+                        'external_url': track['external_urls']['spotify'],
+                        'album_image': track['album']['images'][0]['url'] if track['album']['images'] else None
+                    })
+
+            return {
+                'id': playlist_id,
+                'name': playlist['name'],
+                'description': playlist.get('description', ''),
                 'emotion': emotion,
-                'genre': selected_genre,
                 'tracks': tracks,
-                'total_tracks': len(tracks)
+                'total_tracks': len(tracks),
+                'external_url': playlist['external_urls']['spotify'],
+                'image': playlist['images'][0]['url'] if playlist['images'] else None
             }
-            
-            return playlist
-            
+
         except Exception as e:
             print(f"Error getting Spotify playlist: {str(e)}")
             return self._get_fallback_playlist(emotion)
     
     def _get_fallback_playlist(self, emotion):
-        # Fallback playlist when Spotify API fails
-        fallback_tracks = {
-            'happy': [
-                {'name': 'Happy', 'artist': 'Pharrell Williams', 'spotify_id': 'fallback'},
-                {'name': 'Good as Hell', 'artist': 'Lizzo', 'spotify_id': 'fallback'}
-            ],
-            'sad': [
-                {'name': 'Someone Like You', 'artist': 'Adele', 'spotify_id': 'fallback'},
-                {'name': 'Mad World', 'artist': 'Gary Jules', 'spotify_id': 'fallback'}
-            ],
-            'angry': [
-                {'name': 'Break Stuff', 'artist': 'Limp Bizkit', 'spotify_id': 'fallback'},
-                {'name': 'Bodies', 'artist': 'Drowning Pool', 'spotify_id': 'fallback'}
-            ]
-        }
-        
+        """Fallback playlist when Spotify API fails"""
+        playlist_id = self.emotion_playlists.get(emotion, '')
+
         return {
-            'name': f'{emotion.title()} Vibes (Fallback)',
+            'id': playlist_id,
+            'name': f'{emotion.title()} Vibes',
+            'description': f'A playlist for {emotion} mood',
             'emotion': emotion,
-            'tracks': fallback_tracks.get(emotion, []),
-            'total_tracks': len(fallback_tracks.get(emotion, []))
+            'tracks': [],
+            'total_tracks': 0,
+            'external_url': f'https://open.spotify.com/playlist/{playlist_id}',
+            'image': None,
+            'error': 'Could not fetch playlist from Spotify'
         }

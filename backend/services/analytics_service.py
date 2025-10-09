@@ -1,128 +1,106 @@
 from datetime import datetime, timedelta
-from sqlalchemy import func, and_
+from sqlalchemy import func, and_, extract
 from models.emotion import EmotionRecord
 from models.database import db
 from collections import defaultdict
 
+
 class AnalyticsService:
-    def __init__(self):
-        self.time_periods = {
-            'morning': (6, 12),    # 6:00 - 11:59
-            'afternoon': (12, 17), # 12:00 - 16:59
-            'evening': (17, 22),   # 17:00 - 21:59
-            'night': (22, 6)       # 22:00 - 5:59 (next day)
-        }
-    
-    def get_emotion_analysis_by_time(self, time_period='week'):
+    """Service for analyzing emotion data and generating statistics"""
+
+    def get_emotions_by_hour(self, user_id):
+        """
+        Get emotion counts grouped by hour of day (0-23)
+        Returns: { "0": {"happy": 3, "sad": 1}, "1": {...}, ... }
+        """
         try:
-            # Calculate date range
-            end_date = datetime.utcnow()
-            if time_period == 'day':
-                start_date = end_date - timedelta(days=1)
-            elif time_period == 'week':
-                start_date = end_date - timedelta(weeks=1)
-            elif time_period == 'month':
-                start_date = end_date - timedelta(days=30)
-            else:
-                start_date = end_date - timedelta(weeks=1)
-            
-            # Get emotions in date range
-            emotions = EmotionRecord.query.filter(
-                and_(
-                    EmotionRecord.timestamp >= start_date,
-                    EmotionRecord.timestamp <= end_date
-                )
-            ).all()
-            
-            # Group by time periods
-            time_analysis = {
-                'morning': defaultdict(int),
-                'afternoon': defaultdict(int),
-                'evening': defaultdict(int),
-                'night': defaultdict(int)
-            }
-            
-            for emotion_record in emotions:
-                hour = emotion_record.timestamp.hour
-                time_slot = self._get_time_slot(hour)
-                time_analysis[time_slot][emotion_record.emotion] += 1
-            
-            # Convert defaultdict to regular dict for JSON serialization
-            analysis_result = {}
-            dominant_emotions = {}
-            
-            for time_slot, emotions_count in time_analysis.items():
-                # Convert to regular dict and calculate percentages
-                total_emotions = sum(emotions_count.values())
-                if total_emotions > 0:
-                    emotion_percentages = {
-                        emotion: round((count / total_emotions) * 100, 1)
-                        for emotion, count in emotions_count.items()
-                    }
-                    analysis_result[time_slot] = emotion_percentages
-                    
-                    # Find dominant emotion
-                    dominant_emotions[time_slot] = max(emotions_count.items(), key=lambda x: x[1])[0]
-                else:
-                    analysis_result[time_slot] = {}
-                    dominant_emotions[time_slot] = 'neutral'
-            
-            return {
-                'time_analysis': analysis_result,
-                'dominant_emotions': dominant_emotions,
-                'total_records': len(emotions),
-                'date_range': {
-                    'start': start_date.isoformat(),
-                    'end': end_date.isoformat()
-                }
-            }
-            
-        except Exception as e:
-            print(f"Error in analytics: {str(e)}")
-            return {
-                'time_analysis': {},
-                'dominant_emotions': {},
-                'total_records': 0,
-                'error': str(e)
-            }
-    
-    def _get_time_slot(self, hour):
-        if 6 <= hour < 12:
-            return 'morning'
-        elif 12 <= hour < 17:
-            return 'afternoon'
-        elif 17 <= hour < 22:
-            return 'evening'
-        else:
-            return 'night'
-    
-    def get_emotion_trends(self, days=7):
-        try:
-            end_date = datetime.utcnow()
-            start_date = end_date - timedelta(days=days)
-            
-            # Group emotions by day
-            emotions_by_day = db.session.query(
-                func.date(EmotionRecord.timestamp).label('date'),
+            # Query emotions grouped by hour and emotion type
+            results = db.session.query(
+                extract('hour', EmotionRecord.timestamp).label('hour'),
                 EmotionRecord.emotion,
                 func.count(EmotionRecord.id).label('count')
             ).filter(
-                and_(
-                    EmotionRecord.timestamp >= start_date,
-                    EmotionRecord.timestamp <= end_date
-                )
+                EmotionRecord.user_id == user_id
             ).group_by(
-                func.date(EmotionRecord.timestamp),
+                extract('hour', EmotionRecord.timestamp),
                 EmotionRecord.emotion
             ).all()
-            
+
             # Format results
-            trends = defaultdict(lambda: defaultdict(int))
-            for date, emotion, count in emotions_by_day:
-                trends[str(date)][emotion] = count
-            
-            return dict(trends)
-            
+            analysis = defaultdict(lambda: defaultdict(int))
+            for hour, emotion, count in results:
+                analysis[str(int(hour))][emotion] = count
+
+            # Convert to regular dict
+            return {hour: dict(emotions) for hour, emotions in analysis.items()}
+
         except Exception as e:
-            print(f"Error getting trends: {str(e)}")
+            print(f"Error in get_emotions_by_hour: {str(e)}")
+            return {}
+
+    def get_emotions_by_day(self, user_id):
+        """
+        Get emotion counts grouped by day of week (0=Monday, 6=Sunday)
+        Returns: { "0": {"happy": 5, "sad": 2}, "1": {...}, ... }
+        """
+        try:
+            # Query emotions grouped by day of week and emotion type
+            # ISOWEEKDAY: 1=Monday, 7=Sunday (we'll convert to 0-6)
+            results = db.session.query(
+                extract('dow', EmotionRecord.timestamp).label('day_of_week'),
+                EmotionRecord.emotion,
+                func.count(EmotionRecord.id).label('count')
+            ).filter(
+                EmotionRecord.user_id == user_id
+            ).group_by(
+                extract('dow', EmotionRecord.timestamp),
+                EmotionRecord.emotion
+            ).all()
+
+            # Format results
+            analysis = defaultdict(lambda: defaultdict(int))
+            for day, emotion, count in results:
+                # Convert PostgreSQL dow (0=Sunday, 6=Saturday) to 0=Monday, 6=Sunday
+                day_normalized = str(int((day + 6) % 7))
+                analysis[day_normalized][emotion] = count
+
+            # Convert to regular dict
+            return {day: dict(emotions) for day, emotions in analysis.items()}
+
+        except Exception as e:
+            print(f"Error in get_emotions_by_day: {str(e)}")
+            return {}
+
+    def get_emotion_distribution(self, user_id):
+        """
+        Get percentage distribution of all emotions
+        Returns: { "happy": 35.5, "sad": 20.0, "angry": 15.5, ... }
+        """
+        try:
+            # Query emotion counts
+            results = db.session.query(
+                EmotionRecord.emotion,
+                func.count(EmotionRecord.id).label('count')
+            ).filter(
+                EmotionRecord.user_id == user_id
+            ).group_by(
+                EmotionRecord.emotion
+            ).all()
+
+            # Calculate total
+            total_emotions = sum(count for _, count in results)
+
+            if total_emotions == 0:
+                return {}
+
+            # Calculate percentages
+            distribution = {}
+            for emotion, count in results:
+                percentage = round((count / total_emotions) * 100, 2)
+                distribution[emotion] = percentage
+
+            return distribution
+
+        except Exception as e:
+            print(f"Error in get_emotion_distribution: {str(e)}")
             return {}
