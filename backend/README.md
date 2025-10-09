@@ -46,6 +46,22 @@ SPOTIFY_CLIENT_SECRET=twoj-spotify-client-secret
 python app.py
 ```
 
+## Konfiguracja bazy danych
+
+Baza danych posiada dymyślnie dane. Aby uruchomić bazę danych należy wykonać
+```bash
+docker compose up -d
+```
+
+dane i tabelki zapiszą się podczas pierwszego uruchomienia bazy. Jeżeli jest potrzeba uruchomienia bazy od nowa należy wykonać
+```bash
+docker compose down -v
+docker compose up -d
+```
+
+Po włączeniu bazy danych dostępna jest aplikacja dbAdmin do zarządzania bazą danych pod adresem localhost:8080. 
+Dane do logowania oraz więcej szczegółowych danych w pliku docker-compose.yml
+
 Backend będzie dostępny pod adresem: `http://localhost:5000`
 
 ## Dokumentacja API
