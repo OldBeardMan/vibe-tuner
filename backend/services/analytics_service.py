@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 from sqlalchemy import func, and_, extract
 from models.emotion import EmotionRecord
+from models.emotion_type import EmotionType
 from models.database import db
 from collections import defaultdict
 
@@ -17,13 +18,15 @@ class AnalyticsService:
             # Query emotions grouped by hour and emotion type
             results = db.session.query(
                 extract('hour', EmotionRecord.timestamp).label('hour'),
-                EmotionRecord.emotion,
+                EmotionType.name,
                 func.count(EmotionRecord.id).label('count')
+            ).join(
+                EmotionType, EmotionRecord.emotion_type_id == EmotionType.id
             ).filter(
                 EmotionRecord.user_id == user_id
             ).group_by(
                 extract('hour', EmotionRecord.timestamp),
-                EmotionRecord.emotion
+                EmotionType.name
             ).all()
 
             # Format results
@@ -48,13 +51,15 @@ class AnalyticsService:
             # ISOWEEKDAY: 1=Monday, 7=Sunday (we'll convert to 0-6)
             results = db.session.query(
                 extract('dow', EmotionRecord.timestamp).label('day_of_week'),
-                EmotionRecord.emotion,
+                EmotionType.name,
                 func.count(EmotionRecord.id).label('count')
+            ).join(
+                EmotionType, EmotionRecord.emotion_type_id == EmotionType.id
             ).filter(
                 EmotionRecord.user_id == user_id
             ).group_by(
                 extract('dow', EmotionRecord.timestamp),
-                EmotionRecord.emotion
+                EmotionType.name
             ).all()
 
             # Format results
@@ -79,12 +84,14 @@ class AnalyticsService:
         try:
             # Query emotion counts
             results = db.session.query(
-                EmotionRecord.emotion,
+                EmotionType.name,
                 func.count(EmotionRecord.id).label('count')
+            ).join(
+                EmotionType, EmotionRecord.emotion_type_id == EmotionType.id
             ).filter(
                 EmotionRecord.user_id == user_id
             ).group_by(
-                EmotionRecord.emotion
+                EmotionType.name
             ).all()
 
             # Calculate total

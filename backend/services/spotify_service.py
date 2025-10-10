@@ -1,6 +1,7 @@
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
 from config.settings import Config
+from models.playlist import EmotionPlaylist
 import random
 
 class SpotifyService:
@@ -11,17 +12,10 @@ class SpotifyService:
         )
         self.spotify = spotipy.Spotify(client_credentials_manager=self.client_credentials_manager)
 
-        # Pre-created playlists mapping (7 playlists for 7 emotions)
-        # TODO: Replace these IDs with actual Spotify playlist IDs
-        self.emotion_playlists = {
-            'happy': '37i9dQZF1DXdPec7aLTmlC',      # Happy Hits
-            'sad': '37i9dQZF1DX7qK8ma5wgG1',        # Sad Indie
-            'angry': '37i9dQZF1DX4pUKG1kS0Ac',      # Rock Classics
-            'surprise': '37i9dQZF1DWZd79rJ6a7lp',   # Electronic Hits
-            'neutral': '37i9dQZF1DX4sWSpwq3LiO',    # Peaceful Piano
-            'fear': '37i9dQZF1DX4pUKG1kS0Ac',       # Dark & Stormy
-            'disgust': '37i9dQZF1DX0XUsuxWHRQd'     # RapCaviar
-        }
+    def _get_playlist_id_for_emotion(self, emotion):
+        """Get playlist ID from database for given emotion"""
+        playlist = EmotionPlaylist.get_by_emotion(emotion)
+        return playlist.spotify_playlist_id if playlist else None
     
     def get_playlist_for_emotion(self, emotion):
         """
@@ -32,8 +26,8 @@ class SpotifyService:
             if not self.spotify:
                 return None
 
-            # Get playlist ID for emotion
-            playlist_id = self.emotion_playlists.get(emotion)
+            # Get playlist ID from database
+            playlist_id = self._get_playlist_id_for_emotion(emotion)
 
             if not playlist_id:
                 return None
@@ -72,7 +66,7 @@ class SpotifyService:
     
     def _get_fallback_playlist(self, emotion):
         """Fallback playlist when Spotify API fails"""
-        playlist_id = self.emotion_playlists.get(emotion, '')
+        playlist_id = self._get_playlist_id_for_emotion(emotion) or ''
 
         return {
             'id': playlist_id,

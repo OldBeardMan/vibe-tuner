@@ -4,18 +4,39 @@ from deepface import DeepFace
 from PIL import Image
 import io
 import hashlib
+from models.emotion_type import EmotionType
 
 class EmotionDetector:
     def __init__(self):
+        # Mapping from DeepFace emotions to our database emotions
+        # This will be validated against database on startup
         self.emotion_mapping = {
             'happy': 'happy',
-            'sad': 'sad', 
+            'sad': 'sad',
             'angry': 'angry',
-            'fear': 'fear',
-            'surprise': 'surprised',
-            'disgust': 'disgust',
-            'neutral': 'neutral'
+            'fear': 'stressed',  # Map fear to stressed
+            'surprise': 'surprise',
+            'disgust': 'angry',  # Map disgust to angry
+            'neutral': 'calm'    # Map neutral to calm
         }
+
+        # Cache valid emotions from database
+        self._valid_emotions = None
+
+    def _get_valid_emotions(self):
+        """Get list of valid emotions from database (cached)"""
+        if self._valid_emotions is None:
+            try:
+                self._valid_emotions = set(EmotionType.get_all_names())
+            except:
+                # Fallback if database is not available
+                self._valid_emotions = {'happy', 'sad', 'angry', 'surprise', 'calm', 'stressed'}
+        return self._valid_emotions
+
+    def _validate_emotion(self, emotion):
+        """Validate if emotion exists in database"""
+        valid_emotions = self._get_valid_emotions()
+        return emotion if emotion in valid_emotions else 'calm'  # Default to calm
     
     def detect_emotion(self, image_file):
         try:
@@ -54,15 +75,19 @@ class EmotionDetector:
             # Get dominant emotion
             dominant_emotion = result['dominant_emotion']
             confidence = result['emotion'][dominant_emotion] / 100.0
-            
+
             # Map to our emotion system
-            mapped_emotion = self.emotion_mapping.get(dominant_emotion, 'neutral')
-            
+            mapped_emotion = self.emotion_mapping.get(dominant_emotion, 'calm')
+
+            # Validate emotion exists in database
+            validated_emotion = self._validate_emotion(mapped_emotion)
+
             return {
-                'emotion': mapped_emotion,
+                'emotion': validated_emotion,
                 'confidence': round(confidence, 3),
                 'image_hash': image_hash,
-                'raw_emotions': result['emotion']
+                'raw_emotions': result['emotion'],
+                'deepface_emotion': dominant_emotion  # Original DeepFace detection
             }
             
         except Exception as e:
