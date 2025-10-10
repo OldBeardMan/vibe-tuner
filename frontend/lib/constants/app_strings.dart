@@ -6,10 +6,13 @@ class AppStrings {
   static const emotionCalm = "spokojny";
   static const emotionStressed = "zestresowany";
 
-  static const settings = "ustawienia";
+  static const settings = "Ustawienia";
   static const homePage = "Strona główna";
   static const history = "Historia";
   static const profile = "Profil";
+  static const recommendedSongs = "Twoje utwory";
+
+  static const unknown = "unknown";
 
   // Home page
   static const homePagePhotoButton = "Zrób zdjęcie";
@@ -49,4 +52,13 @@ class AppStrings {
   static const userPageShowPersonalData = "Pokaż swoje dane";
   static const userPageDeleteAccount = "Usuń konto";
 
+
+  // Dialog
+  static const dialogTitle = "Twoja emocja";
+  static const dialogCancel = "Anuluj";
+  static const dialogNext = "Dalej";
+
+  // Recomended Songs
+  static const recommendedSongsPageNoSongsFound = "Nie znaleziono utworów";
+  static const recommendedSongsBackButtonLabel = "Powrót";
 }

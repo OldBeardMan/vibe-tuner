@@ -1,0 +1,10 @@
+{
+  "generatedAt": "2025-10-09T11:30:00Z",
+  "songs": [
+    { "title": "Break Stuff", "artist": "Limp Bizkit", "durationMs": 189000 },
+    { "title": "Killing In The Name", "artist": "Rage Against The Machine", "durationMs": 314000 },
+    { "title": "You Oughta Know", "artist": "Alanis Morissette", "durationMs": 253000 },
+    { "title": "Smells Like Teen Spirit", "artist": "Nirvana", "durationMs": 301000 },
+    { "title": "Given Up", "artist": "Linkin Park", "durationMs": 186000 }
+  ]
+}

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:vibe_tuner/constants/app_paths.dart';
 import '../providers/auth_provider.dart';
 
 class LoginPage extends StatelessWidget {
@@ -13,7 +14,7 @@ class LoginPage extends StatelessWidget {
           onPressed: () {
             // TODO: tutaj dodasz autentykację/ backend
             Provider.of<AuthProvider>(context, listen: false).login();
-            context.go('/home');
+            context.go(AppPaths.homePage);
           },
           child: const Text('Zaloguj się'),
         ),
