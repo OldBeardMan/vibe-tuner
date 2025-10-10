@@ -2,6 +2,8 @@ import 'package:vibe_tuner/constants/app_sizes.dart';
 import 'package:vibe_tuner/constants/app_strings.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:vibe_tuner/widgets/selected_emotion_dialog.dart';
+import '../constants/mapping/emotion_mapping.dart';
 import '../providers/emotion_provider.dart';
 
 class EmotionPicker extends StatefulWidget {
@@ -93,7 +95,7 @@ class _EmotionPickerState extends State<EmotionPicker>
                 mainAxisSpacing: 4,
                 crossAxisSpacing: 4,
                 childAspectRatio: 2.6,
-                children: emoProv.emotions.map((e) {
+                children: emoProv.emotions.map((emotion) {
                   return Padding(
                     padding: const EdgeInsets.all(6),
                     child: ElevatedButton(
@@ -109,11 +111,23 @@ class _EmotionPickerState extends State<EmotionPicker>
                         ),
                       ),
                       onPressed: () {
-                        emoProv.selectEmotion(e);
+                        final code = emotionCodeFromName(emotion);
+
+                        showGeneralDialog(
+                          context: context,
+                          barrierLabel: 'SelectedEmotionDialog',
+                          barrierDismissible: true,
+                          barrierColor: Colors.black.withValues(alpha: 0.4),
+                          pageBuilder: (context, anim1, anim2) {
+                            return Center(
+                              child: SelectedEmotionDialog(emotionCode: code),
+                            );
+                          },
+                        );
                         _toggleExpanded();
                       },
                       child: Text(
-                        e,
+                        emotion,
                         style: const TextStyle(fontSize: 13),
                         textAlign: TextAlign.center,
                       ),

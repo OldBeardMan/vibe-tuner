@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:vibe_tuner/constants/app_paths.dart';
+import 'package:vibe_tuner/pages/recommended_songs_page.dart';
 import 'constants/app_strings.dart';
 import 'pages/login_page.dart';
 import 'pages/home_page.dart';
@@ -8,18 +10,18 @@ import 'pages/history_page.dart';
 import 'pages/user_page.dart';
 
 final GoRouter router = GoRouter(
-  initialLocation: '/',
+  initialLocation: AppPaths.baseLocation,
   routes: [
-    GoRoute(path: '/', builder: (context, state) => const LoginPage()),
+    GoRoute(path: AppPaths.baseLocation, builder: (context, state) => const LoginPage()),
     ShellRoute(
       builder: (context, state, child) {
         final location = state.uri.toString();
         int currentIndex = 1;
-        if (location.startsWith('/settings')) {
+        if (location.startsWith(AppPaths.settingsPage)) {
           currentIndex = 0;
-        } else if (location.startsWith('/home')) {
+        } else if (location.startsWith(AppPaths.homePage)) {
           currentIndex = 1;
-        } else if (location.startsWith('/history')) {
+        } else if (location.startsWith(AppPaths.historyPage)) {
           currentIndex = 2;
         }
 
@@ -28,9 +30,9 @@ final GoRouter router = GoRouter(
           bottomNavigationBar: BottomNavigationBar(
             currentIndex: currentIndex,
             onTap: (index) {
-              if (index == 0) context.go('/settings');
-              if (index == 1) context.go('/home');
-              if (index == 2) context.go('/history');
+              if (index == 0) context.go(AppPaths.settingsPage);
+              if (index == 1) context.go(AppPaths.homePage);
+              if (index == 2) context.go(AppPaths.historyPage);
             },
             items: const [
               BottomNavigationBarItem(icon: Icon(Icons.settings), label: AppStrings.settings),
@@ -41,11 +43,19 @@ final GoRouter router = GoRouter(
         );
       },
       routes: [
-        GoRoute(path: '/home', builder: (context, state) => const HomePage()),
-        GoRoute(path: '/settings', builder: (context, state) => const SettingsPage()),
-        GoRoute(path: '/history', builder: (context, state) => const HistoryPage()),
+        GoRoute(path: AppPaths.homePage, builder: (context, state) => const HomePage()),
+        GoRoute(path: AppPaths.settingsPage, builder: (context, state) => const SettingsPage()),
+        GoRoute(path: AppPaths.historyPage, builder: (context, state) => const HistoryPage()),
+        GoRoute(
+          path: AppPaths.recommendedSongsPage,
+          builder: (context, state) {
+            final q = state.uri.queryParameters['emotion'];
+            final code = q != null ? int.tryParse(q) ?? 4 : 4;
+            return RecommendedSongsPage(emotionCode: code);
+          },
+        ),
       ],
     ),
-    GoRoute(path: '/user', builder: (context, state) => const UserPage()),
+    GoRoute(path: AppPaths.userPage, builder: (context, state) => const UserPage()),
   ],
 );

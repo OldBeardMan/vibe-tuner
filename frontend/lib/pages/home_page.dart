@@ -1,3 +1,4 @@
+import 'package:vibe_tuner/constants/app_paths.dart';
 import 'package:vibe_tuner/constants/app_strings.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -30,7 +31,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
         actions: [
           IconButton(
             icon: const Icon(Icons.person_outline, size: 28),
-            onPressed: () => context.push('/user'),
+            onPressed: () => context.push(AppPaths.userPage),
           ),
         ],
       ),

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:vibe_tuner/constants/app_paths.dart';
 
 import '../constants/app_sizes.dart';
 import '../constants/app_strings.dart';
@@ -28,7 +29,7 @@ class SettingsPage extends StatelessWidget {
         ),
       ),
         actions: [
-          IconButton(onPressed: () => context.push('/user'), icon: const Icon(Icons.person_outline))
+          IconButton(onPressed: () => context.push(AppPaths.userPage), icon: const Icon(Icons.person_outline))
         ],
       ),
       body: Column(
