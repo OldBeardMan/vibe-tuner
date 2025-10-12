@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:vibe_tuner/providers/camera_provider.dart';
 import 'package:vibe_tuner/providers/theme_provider.dart';
 import 'router.dart';
 import 'providers/auth_provider.dart';
@@ -14,6 +15,7 @@ void main() {
         ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => EmotionProvider()),
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
+        ChangeNotifierProvider(create: (_) => CameraProvider()),
       ],
       child: const MyApp(),
     ),

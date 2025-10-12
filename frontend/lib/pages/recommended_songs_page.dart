@@ -33,7 +33,7 @@ class _RecommendedSongsPageState extends State<RecommendedSongsPage> {
     // simulate network delay
     await Future.delayed(const Duration(milliseconds: 800));
 
-    final path = 'lib/assets/mock/response/recommendations_emotion_$emotionCode.json';
+    final path = 'lib/assets/mock/response/recommended_songs/recommendations_emotion_$emotionCode.json';
 
     try {
       final raw = await rootBundle.loadString(path);

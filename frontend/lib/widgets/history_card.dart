@@ -95,7 +95,6 @@ class _HistoryCardState extends State<HistoryCard>
                     color: Colors.transparent,
                   ),
                   child: Center(
-                    // TODO
                     child: SvgPicture.asset(
                       iconLink!,
                       width: AppSizes.historyCardIconSize,

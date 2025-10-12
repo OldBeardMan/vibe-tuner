@@ -57,6 +57,12 @@ class AppStrings {
   static const dialogTitle = "Twoja emocja";
   static const dialogCancel = "Anuluj";
   static const dialogNext = "Dalej";
+  static const dialogLoadingMessages = [
+    'Już chwila...',
+    'Jeszcze moment...',
+    'Prawie gotowe...',
+    'Zaraz pokażę propozycje...'
+  ];
 
   // Recomended Songs
   static const recommendedSongsPageNoSongsFound = "Nie znaleziono utworów";

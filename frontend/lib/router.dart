@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:vibe_tuner/constants/app_paths.dart';
+import 'package:vibe_tuner/pages/camera_page.dart';
 import 'package:vibe_tuner/pages/recommended_songs_page.dart';
+import 'package:vibe_tuner/widgets/selected_emotion_dialog.dart';
 import 'constants/app_strings.dart';
 import 'pages/login_page.dart';
 import 'pages/home_page.dart';
@@ -25,9 +27,14 @@ final GoRouter router = GoRouter(
           currentIndex = 2;
         }
 
+        final hideOn = [
+          AppPaths.cameraPage,
+        ];
+        final bool showBottomBar = !hideOn.any((p) => location.startsWith(p));
+
         return Scaffold(
           body: child,
-          bottomNavigationBar: BottomNavigationBar(
+          bottomNavigationBar: showBottomBar ? BottomNavigationBar(
             currentIndex: currentIndex,
             onTap: (index) {
               if (index == 0) context.go(AppPaths.settingsPage);
@@ -39,7 +46,7 @@ final GoRouter router = GoRouter(
               BottomNavigationBarItem(icon: Icon(Icons.home), label: AppStrings.homePage),
               BottomNavigationBarItem(icon: Icon(Icons.calendar_today), label: AppStrings.history),
             ],
-          ),
+          ) : null,
         );
       },
       routes: [
@@ -54,6 +61,8 @@ final GoRouter router = GoRouter(
             return RecommendedSongsPage(emotionCode: code);
           },
         ),
+        GoRoute(path: AppPaths.emotionDialog, builder: (context, state) => const SelectedEmotionDialog()),
+        GoRoute(path: AppPaths.cameraPage, builder: (context, state) => const CameraPage()),
       ],
     ),
     GoRoute(path: AppPaths.userPage, builder: (context, state) => const UserPage()),

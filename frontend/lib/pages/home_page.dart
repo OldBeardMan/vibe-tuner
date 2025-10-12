@@ -55,7 +55,7 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
 
               ElevatedButton(
                 onPressed: () {
-                  // TODO: integracja z kamerą + analiza emocji
+                  context.go(AppPaths.cameraPage);
                 },
                 style:  ElevatedButton.styleFrom(
                   minimumSize: const Size(300, 12)

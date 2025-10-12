@@ -5,4 +5,6 @@ class AppPaths {
   static const historyPage = "/history";
   static const settingsPage = "/settings";
   static const recommendedSongsPage = "/recommendedSongs";
+  static const emotionDialog = "/emotionDialog";
+  static const cameraPage = "/camera";
 }

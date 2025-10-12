@@ -39,6 +39,9 @@ class AppSizes {
   static const double dialogButtonVerticalPadding = 12.0;
   static const double dialogButtonGap = 12.0;
   static const double dialogCloseButtonSplashRadius = 20.0;
+  static const double dialogSpinningIconSize = 40.0;
+  static const dialogLoadingMessagesDuration = 2000;
+  static const dialogLoadingMessagesAnimation = 500;
 
   static const double recommendedSongsPageListAreaHorizontalPadding = 12.0;
   static const double recommendedSongsPageSongsSpace = 8.0;
@@ -49,4 +52,12 @@ class AppSizes {
   static const double recommendedSongsPageSongAreaHeight = 64.0;
   static const double recommendedSongsPageSongAreaHorizontalPadding = 10.0;
   static const double recommendedSongsPageNumbersSize = 34.0;
+
+  static const double cameraButtonsPadding = 24;
+  static const double cameraSideButtonSize = 28.0;
+  static const double cameraPhotoButtonBorderSize = 76.0;
+  static const double cameraPhotoButtonSize = 36.0;
+  static const double cameraPhotoSizeConversion = 0.9;
+  static const double cameraPhotoBorderRadius = 18.0;
+  static const double cameraButtonSpaceHeight = 110.0;
 }
