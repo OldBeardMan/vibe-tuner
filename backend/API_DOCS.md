@@ -16,7 +16,7 @@ POST /api/auth/register
 **Body:**
 ```json
 {
-  "email": "user@example.com",
+  "email": "matt@krupa.net",
   "password": "password123"
 }
 ```
@@ -27,7 +27,7 @@ POST /api/auth/register
   "message": "User registered successfully",
   "user": {
     "id": 1,
-    "email": "user@example.com",
+    "email": "matt@krupa.net",
     "created_at": "2025-01-15T10:00:00"
   }
 }
@@ -41,7 +41,7 @@ POST /api/auth/login
 **Body:**
 ```json
 {
-  "email": "user@example.com",
+  "email": "matt@krupa.net",
   "password": "password123"
 }
 ```
@@ -52,7 +52,7 @@ POST /api/auth/login
   "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
   "user": {
     "id": 1,
-    "email": "user@example.com",
+    "email": "matt@krupa.net",
     "created_at": "2025-01-15T10:00:00"
   }
 }
@@ -91,8 +91,8 @@ Content-Type: multipart/form-data
     "emotion": "happy",
     "tracks": [
       {
-        "name": "Happy",
-        "artist": "Pharrell Williams",
+        "name": "Iceland",
+        "artist": "Matt Krupa",
         "spotify_id": "60nZcImufyMA1MKQY3dcCH",
         "preview_url": "https://...",
         "external_url": "https://open.spotify.com/track/...",
@@ -342,14 +342,16 @@ Backend używa 6 playlist Spotify przechowywanych w bazie danych (tabela `emotio
 
 | Emocja | Playlist ID | Nazwa |
 |--------|------------|-------|
-| **happy** | `5rVURM4D0xpqfvqW1pHk6Q` | Happy Vibes |
-| **sad** | `0Xy2AujP799aB7ugPdjYkl` | Sad Vibes |
-| **angry** | `2jkVRCPWLXyyVUoH5TESDN` | Angry Vibes |
+| **happy** | `5rVURM4D0xpqfvqW1pHk6Q` | Happy Vibes (feat. Iceland) |
+| **sad** | `0Xy2AujP799aB7ugPdjYkl` | Sad Vibes (feat. Winter) |
+| **angry** | `2jkVRCPWLXyyVUoH5TESDN` | Angry Vibes (feat. Blooming Cactus) |
 | **surprise** | `1EbTcG3TOFCneb6oBq9CMd` | Surprise Vibes |
-| **calm** | `6oruukJQNs89eHY5gGCAXl` | Calm Vibes |
+| **calm** | `6oruukJQNs89eHY5gGCAXl` | Calm Vibes (feat. In The Autumn Forest) |
 | **stressed** | `4OI3t5sg9143MkUlPK2iZY` | Stressed Vibes |
 
 Playlisty są automatycznie ładowane z bazy danych przez `SpotifyService`.
+
+**Fun fact:** Niektóre playlisty zawierają ambient/acoustic utwory [Matt Krupa](https://mattkrupa.net)
 
 ---
 

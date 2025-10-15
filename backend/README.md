@@ -28,6 +28,12 @@ venv\Scripts\activate     # Windows
 pip install -r requirements.txt
 ```
 
+**Uwaga:** Jeśli napotkasz błąd `module 'jwt' has no attribute 'encode'`, usuń starą bibliotekę `jwt` i zainstaluj `PyJWT`:
+```bash
+pip uninstall jwt -y
+pip install PyJWT
+```
+
 4. **Skopiuj plik konfiguracyjny:**
 ```bash
 cp .env.example .env
@@ -127,7 +133,27 @@ backend/
 1. Utwórz aplikację na [Spotify Developer Dashboard](https://developer.spotify.com/dashboard)
 2. Skopiuj **Client ID** i **Client Secret**
 3. Dodaj je do pliku `.env`
-4. W pliku `services/spotify_service.py` możesz zaktualizować ID playlist dla poszczególnych emocji
+4. Playlisty dla poszczególnych emocji są przechowywane w bazie danych w tabeli `emotion_playlists`
+
+## Troubleshooting
+
+### Problem z JWT
+**Błąd:** `module 'jwt' has no attribute 'encode'`
+```bash
+pip uninstall jwt -y
+pip install PyJWT
+```
+
+### Problem z PostgreSQL i numpy
+**Błąd:** `can't adapt type 'numpy.float32'`
+- Ten problem został rozwiązany w kodzie poprzez konwersję wartości numpy na Python float
+- Upewnij się, że masz najnowszą wersję kodu z `services/emotion_detector.py`
+
+### Problem z DeepFace
+Jeśli DeepFace nie może wykryć twarzy, upewnij się że:
+- Zdjęcie zawiera wyraźną twarz
+- Oświetlenie jest odpowiednie
+- Twarz jest skierowana w stronę kamery
 
 ## Licencja
 

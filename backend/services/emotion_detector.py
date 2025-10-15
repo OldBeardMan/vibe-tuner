@@ -74,7 +74,7 @@ class EmotionDetector:
             
             # Get dominant emotion
             dominant_emotion = result['dominant_emotion']
-            confidence = result['emotion'][dominant_emotion] / 100.0
+            confidence = float(result['emotion'][dominant_emotion] / 100.0)
 
             # Map to our emotion system
             mapped_emotion = self.emotion_mapping.get(dominant_emotion, 'calm')
@@ -84,7 +84,7 @@ class EmotionDetector:
 
             return {
                 'emotion': validated_emotion,
-                'confidence': round(confidence, 3),
+                'confidence': float(round(confidence, 3)),
                 'image_hash': image_hash,
                 'raw_emotions': result['emotion'],
                 'deepface_emotion': dominant_emotion  # Original DeepFace detection
