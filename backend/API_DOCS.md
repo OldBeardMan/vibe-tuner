@@ -64,10 +64,14 @@ POST /api/auth/login
 
 ## Detekcja emocji
 
-### Analiza emocji ze zdjęcia
+### Analiza emocji ze zdjęcia lub ręczne wprowadzenie emocji
 ```
 POST /api/emotion/analyze
 ```
+
+Ten endpoint obsługuje dwa tryby:
+
+#### Tryb 1: Analiza ze zdjęcia (detekcja emocji)
 
 **Headers:**
 ```
@@ -78,7 +82,42 @@ Content-Type: multipart/form-data
 **Body:**
 - `image`: plik zdjęcia (multipart/form-data)
 
-**Response (200):**
+**Przykład (curl):**
+```bash
+curl -X POST http://localhost:5000/api/emotion/analyze \
+  -H "Authorization: Bearer <token>" \
+  -F "image=@selfie.jpg"
+```
+
+#### Tryb 2: Ręczne wprowadzenie emocji (bez zdjęcia)
+
+**Headers:**
+```
+Authorization: Bearer <token>
+Content-Type: application/json
+```
+
+**Body:**
+```json
+{
+  "emotion": "happy",
+  "confidence": 0.85
+}
+```
+
+**Pola:**
+- `emotion` (wymagane): nazwa emocji (`happy`, `sad`, `angry`, `surprise`, `calm`, `stressed`)
+- `confidence` (opcjonalne): poziom pewności (0.0-1.0), domyślnie 1.0
+
+**Przykład (curl):**
+```bash
+curl -X POST http://localhost:5000/api/emotion/analyze \
+  -H "Authorization: Bearer <token>" \
+  -H "Content-Type: application/json" \
+  -d '{"emotion": "happy", "confidence": 0.85}'
+```
+
+#### Response (200) - dla obu trybów:
 ```json
 {
   "id": 123,
@@ -109,7 +148,7 @@ Content-Type: multipart/form-data
 
 **Możliwe emocje:** `happy`, `sad`, `angry`, `surprise`, `calm`, `stressed`
 
-**Uwaga:** Emocje są przechowywane w bazie danych w tabeli `emotion_types`. DeepFace wykrywa emocje (`happy`, `sad`, `angry`, `fear`, `surprise`, `disgust`, `neutral`), które są mapowane na dostępne emocje:
+**Uwaga:** Emocje są przechowywane w bazie danych w tabeli `emotion_types`. W trybie analizy zdjęcia, DeepFace wykrywa emocje (`happy`, `sad`, `angry`, `fear`, `surprise`, `disgust`, `neutral`), które są mapowane na dostępne emocje:
 - `fear` → `stressed`
 - `disgust` → `angry`
 - `neutral` → `calm`

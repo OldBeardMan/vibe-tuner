@@ -15,32 +15,62 @@ spotify_service = SpotifyService()
 @token_required
 def analyze_emotion():
     """
-    Analyze emotion from uploaded image
-    Requires: multipart/form-data with 'image' field
+    Analyze emotion from uploaded image OR accept manually provided emotion
+
+    Two modes:
+    1. Image mode: multipart/form-data with 'image' field
+    2. Manual mode: JSON with 'emotion' field and optional 'confidence' field
+
     Returns: emotion, confidence, playlist info
     """
     try:
-        # Check if image is in request
-        if 'image' not in request.files:
-            return jsonify({'error': 'No image provided'}), 400
+        # Check if this is manual emotion input (JSON)
+        if request.is_json:
+            data = request.get_json()
 
-        image_file = request.files['image']
+            if 'emotion' not in data:
+                return jsonify({'error': 'No emotion provided in request body'}), 400
 
-        if image_file.filename == '':
-            return jsonify({'error': 'No image selected'}), 400
+            emotion_name = data.get('emotion')
+            confidence = data.get('confidence', 1.0)  # Default confidence to 1.0 for manual input
 
-        # Detect emotion using DeepFace
-        emotion_result = emotion_detector.detect_emotion(image_file)
+            # Validate confidence
+            if not isinstance(confidence, (int, float)) or not (0 <= confidence <= 1):
+                return jsonify({'error': 'Confidence must be a number between 0 and 1'}), 400
 
-        if not emotion_result:
-            return jsonify({'error': 'Could not detect face or emotion in the image'}), 400
+            # Get emotion type from database
+            emotion_type = EmotionType.get_by_name(emotion_name)
+            if not emotion_type:
+                return jsonify({'error': f"Invalid emotion type: {emotion_name}"}), 400
 
-        # Get emotion type from database
-        emotion_type = EmotionType.get_by_name(emotion_result['emotion'])
-        if not emotion_type:
-            return jsonify({'error': f"Invalid emotion type: {emotion_result['emotion']}"}), 400
+            emotion_result = {
+                'emotion': emotion_name,
+                'confidence': confidence
+            }
 
-        # Get Spotify playlist for detected emotion
+        # Otherwise, expect image upload (original behavior)
+        else:
+            # Check if image is in request
+            if 'image' not in request.files:
+                return jsonify({'error': 'No image or emotion data provided'}), 400
+
+            image_file = request.files['image']
+
+            if image_file.filename == '':
+                return jsonify({'error': 'No image selected'}), 400
+
+            # Detect emotion using DeepFace
+            emotion_result = emotion_detector.detect_emotion(image_file)
+
+            if not emotion_result:
+                return jsonify({'error': 'Could not detect face or emotion in the image'}), 400
+
+            # Get emotion type from database
+            emotion_type = EmotionType.get_by_name(emotion_result['emotion'])
+            if not emotion_type:
+                return jsonify({'error': f"Invalid emotion type: {emotion_result['emotion']}"}), 400
+
+        # Get Spotify playlist for detected/provided emotion
         playlist = spotify_service.get_playlist_for_emotion(emotion_result['emotion'])
 
         # Save emotion record to database
@@ -53,8 +83,6 @@ def analyze_emotion():
 
         db.session.add(emotion_record)
         db.session.commit()
-
-        # Image is automatically deleted after processing (handled in memory)
 
         return jsonify({
             'id': emotion_record.id,
