@@ -53,7 +53,7 @@ class AppStrings {
   static const userPageDeleteAccount = "Usuń konto";
 
 
-  // Dialog
+  // Emotion Dialog
   static const dialogTitle = "Twoja emocja";
   static const dialogCancel = "Anuluj";
   static const dialogNext = "Dalej";
@@ -67,4 +67,28 @@ class AppStrings {
   // Recomended Songs
   static const recommendedSongsPageNoSongsFound = "Nie znaleziono utworów";
   static const recommendedSongsBackButtonLabel = "Powrót";
+
+  // Exceptions
+  static const noTokenReturn = "No token returned from server";
+  static const serverConnectionError = "Brak połączenia z serwerem. Sprawdź połączenie sieciowe.";
+  static const serverNotRespondingError = "Serwer nie odpowiada. Spróbuj ponownie później.";
+
+  // Login Register page
+  static const invalidEmail = "Niepoprawny email";
+  static const invalidPasswordHint = "Hasło musi mieć co najmniej 6 znaków";
+  static const passwordNoMatch = "Hasła nie są zgodne";
+  static const enterEmail = "Wprowadź email";
+  static const enterPassword = "Wprowadź hasło";
+  static const logIn = "Zaloguj się";
+  static const signIn = "Zarejestruj się";
+  static const email = "Email";
+  static const password = "Hasło";
+  static const confirmPassword = "Powtórz hasło";
+  static const noAccountQuestion = "Nie masz konta? ";
+  static const existAccountQuestion = "Masz już konto? ";
+  static const logOutDialogTitle = "Wylogować się?";
+  static const logOutDialogBody = "Czy na pewno chcesz się wylogować z aplikacji na tym urządzeniu?";
+  static const signedIn = "Zarejestrowano. Możesz się zalogować.";
+  static const logOut = "Wyloguj";
+  static const logOut2 = "Wyloguj się";
 }

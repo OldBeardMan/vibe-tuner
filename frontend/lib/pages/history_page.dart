@@ -7,11 +7,6 @@ import 'package:vibe_tuner/constants/app_strings.dart';
 import '../constants/app_sizes.dart';
 import '../constants/mock/history_card_mock.dart';
 
-/*
-
-// TODO DODAĆ STRINGI ===============
-
- */
 class HistoryPage extends StatelessWidget {
   const HistoryPage({super.key});
   @override

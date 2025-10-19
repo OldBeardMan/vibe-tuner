@@ -6,6 +6,7 @@ import 'package:vibe_tuner/constants/app_strings.dart';
 import '../constants/app_sizes.dart';
 import '../widgets/expandable_card.dart';
 import '../widgets/expandable_card_title.dart';
+import '../widgets/loggout_card.dart';
 
 class UserPage extends StatelessWidget {
   const UserPage({super.key});
@@ -66,6 +67,8 @@ class UserPage extends StatelessWidget {
               ],
             ),
           ),
+
+          LogoutCard(),
 
           // === Usuń konto ===
           ExpandableCard(

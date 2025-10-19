@@ -13,26 +13,17 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-
-  # Routing nowej generacji
   go_router: ^14.1.4
-
-  # Lekki i popularny state management
   provider: ^6.1.2
-
-  # Obsługa kamer - przygotowane pod przyszłą integrację
   camera: ^0.11.0+2
-
-  # Wsparcie dla SVG (opcjonalne, na ikony lub grafiki)
+  image_picker: ^0.8.7
+  image: ^4.0.17
   flutter_svg: ^2.0.10+1
-
-  # Google Fonts (np. Montserrat, Roboto itp.)
   google_fonts: ^6.2.1
-
-  # Material Icons i Cupertino Icons
   cupertino_icons: ^1.0.8
-
   shared_preferences: ^2.0.0
+  http: ^1.5.0
+  flutter_secure_storage: ^8.0.0
 
 dev_dependencies:
   flutter_test:
@@ -43,15 +34,7 @@ dev_dependencies:
 flutter:
   uses-material-design: true
 
-  # Sekcja assetów (dodasz tu grafiki, np. ikonki)
-#  assets:
-#    - assets/icons/
-#    - assets/images/
-
-  # Sekcja czcionek - jeśli chcesz dodać własne
-#  fonts:
-#    - family: Montserrat
-##      fonts:
-##        - asset: assets/fonts/Montserrat-Regular.ttf
-##        - asset: assets/fonts/Montserrat-Bold.ttf
-##          weight: 700
+  assets:
+    - lib/assets/icons/
+    - lib/assets/mock/response/recommended_emotion/
+    - lib/assets/mock/response/recommended_songs/
