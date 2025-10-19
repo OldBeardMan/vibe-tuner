@@ -54,7 +54,7 @@ class SettingsPage extends StatelessWidget {
             title: ExpandableCardTitle(
               title: AppStrings.settingsPageFaq,
             ),
-            body: FaqChildren(),
+            body: _FaqChildren(),
           ),
 
           // === Prywatność ==
@@ -103,8 +103,8 @@ class SettingsPage extends StatelessWidget {
   }
 }
 
-class FaqChildren extends StatelessWidget {
-  const FaqChildren({super.key});
+class _FaqChildren extends StatelessWidget {
+  const _FaqChildren({super.key});
 
   @override
   Widget build(BuildContext context) {
