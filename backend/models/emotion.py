@@ -6,7 +6,7 @@ class EmotionRecord(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False, index=True)
-    emotion = db.Column(db.String(50), nullable=False)
+    emotion_type_id = db.Column(db.Integer, db.ForeignKey('emotion_types.id'), nullable=False, index=True)
     confidence = db.Column(db.Float, nullable=False)
     timestamp = db.Column(db.DateTime, default=datetime.utcnow, nullable=False, index=True)
     spotify_playlist_id = db.Column(db.String(100), nullable=True)
@@ -14,7 +14,8 @@ class EmotionRecord(db.Model):
     def to_dict(self):
         return {
             'id': self.id,
-            'emotion': self.emotion,
+            'emotion': self.emotion_type.name if self.emotion_type else None,
+            'emotion_display_name': self.emotion_type.display_name if self.emotion_type else None,
             'confidence': self.confidence,
             'timestamp': self.timestamp.isoformat(),
             'spotify_playlist_id': self.spotify_playlist_id

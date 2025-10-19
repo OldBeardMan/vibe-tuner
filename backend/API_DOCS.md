@@ -16,7 +16,7 @@ POST /api/auth/register
 **Body:**
 ```json
 {
-  "email": "user@example.com",
+  "email": "matt@krupa.net",
   "password": "password123"
 }
 ```
@@ -27,7 +27,7 @@ POST /api/auth/register
   "message": "User registered successfully",
   "user": {
     "id": 1,
-    "email": "user@example.com",
+    "email": "matt@krupa.net",
     "created_at": "2025-01-15T10:00:00"
   }
 }
@@ -41,7 +41,7 @@ POST /api/auth/login
 **Body:**
 ```json
 {
-  "email": "user@example.com",
+  "email": "matt@krupa.net",
   "password": "password123"
 }
 ```
@@ -52,7 +52,7 @@ POST /api/auth/login
   "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
   "user": {
     "id": 1,
-    "email": "user@example.com",
+    "email": "matt@krupa.net",
     "created_at": "2025-01-15T10:00:00"
   }
 }
@@ -64,10 +64,14 @@ POST /api/auth/login
 
 ## Detekcja emocji
 
-### Analiza emocji ze zdjęcia
+### Analiza emocji ze zdjęcia lub ręczne wprowadzenie emocji
 ```
 POST /api/emotion/analyze
 ```
+
+Ten endpoint obsługuje dwa tryby:
+
+#### Tryb 1: Analiza ze zdjęcia (detekcja emocji)
 
 **Headers:**
 ```
@@ -78,21 +82,56 @@ Content-Type: multipart/form-data
 **Body:**
 - `image`: plik zdjęcia (multipart/form-data)
 
-**Response (200):**
+**Przykład (curl):**
+```bash
+curl -X POST http://localhost:5000/api/emotion/analyze \
+  -H "Authorization: Bearer <token>" \
+  -F "image=@selfie.jpg"
+```
+
+#### Tryb 2: Ręczne wprowadzenie emocji (bez zdjęcia)
+
+**Headers:**
+```
+Authorization: Bearer <token>
+Content-Type: application/json
+```
+
+**Body:**
+```json
+{
+  "emotion": "happy",
+  "confidence": 0.85
+}
+```
+
+**Pola:**
+- `emotion` (wymagane): nazwa emocji (`happy`, `sad`, `angry`, `surprise`, `calm`, `stressed`)
+- `confidence` (opcjonalne): poziom pewności (0.0-1.0), domyślnie 1.0
+
+**Przykład (curl):**
+```bash
+curl -X POST http://localhost:5000/api/emotion/analyze \
+  -H "Authorization: Bearer <token>" \
+  -H "Content-Type: application/json" \
+  -d '{"emotion": "happy", "confidence": 0.85}'
+```
+
+#### Response (200) - dla obu trybów:
 ```json
 {
   "id": 123,
   "emotion": "happy",
   "confidence": 0.95,
   "playlist": {
-    "id": "37i9dQZF1DXdPec7aLTmlC",
-    "name": "Happy Hits",
-    "description": "Feel-good songs...",
+    "id": "5rVURM4D0xpqfvqW1pHk6Q",
+    "name": "Happy Vibes",
+    "description": "Uplifting songs to boost your mood",
     "emotion": "happy",
     "tracks": [
       {
-        "name": "Happy",
-        "artist": "Pharrell Williams",
+        "name": "Iceland",
+        "artist": "Matt Krupa",
         "spotify_id": "60nZcImufyMA1MKQY3dcCH",
         "preview_url": "https://...",
         "external_url": "https://open.spotify.com/track/...",
@@ -107,7 +146,12 @@ Content-Type: multipart/form-data
 }
 ```
 
-**Możliwe emocje:** `happy`, `sad`, `angry`, `surprise`, `neutral`, `fear`, `disgust`
+**Możliwe emocje:** `happy`, `sad`, `angry`, `surprise`, `calm`, `stressed`
+
+**Uwaga:** Emocje są przechowywane w bazie danych w tabeli `emotion_types`. W trybie analizy zdjęcia, DeepFace wykrywa emocje (`happy`, `sad`, `angry`, `fear`, `surprise`, `disgust`, `neutral`), które są mapowane na dostępne emocje:
+- `fear` → `stressed`
+- `disgust` → `angry`
+- `neutral` → `calm`
 
 ---
 
@@ -134,9 +178,10 @@ Authorization: Bearer <token>
     {
       "id": 123,
       "emotion": "happy",
+      "emotion_display_name": "Happy",
       "confidence": 0.95,
       "timestamp": "2025-01-15T10:30:00",
-      "spotify_playlist_id": "37i9dQZF1DXdPec7aLTmlC"
+      "spotify_playlist_id": "5rVURM4D0xpqfvqW1pHk6Q"
     }
   ],
   "total": 150,
@@ -160,9 +205,10 @@ Authorization: Bearer <token>
 {
   "id": 123,
   "emotion": "happy",
+  "emotion_display_name": "Happy",
   "confidence": 0.95,
   "timestamp": "2025-01-15T10:30:00",
-  "spotify_playlist_id": "37i9dQZF1DXdPec7aLTmlC"
+  "spotify_playlist_id": "5rVURM4D0xpqfvqW1pHk6Q"
 }
 ```
 
@@ -183,6 +229,36 @@ Authorization: Bearer <token>
 }
 ```
 
+### Pobranie dostępnych typów emocji
+```
+GET /api/emotions/types
+```
+
+**Response (200):**
+```json
+{
+  "emotion_types": [
+    {
+      "id": 1,
+      "name": "happy",
+      "display_name": "Happy",
+      "description": "Feeling joyful, cheerful, and content",
+      "created_at": "2025-01-15T10:00:00"
+    },
+    {
+      "id": 2,
+      "name": "sad",
+      "display_name": "Sad",
+      "description": "Feeling down, melancholic, or blue",
+      "created_at": "2025-01-15T10:00:00"
+    }
+  ],
+  "total": 6
+}
+```
+
+**Uwaga:** Ten endpoint jest publiczny (nie wymaga autoryzacji) i zwraca wszystkie dostępne typy emocji zdefiniowane w bazie danych.
+
 ---
 
 ## Analityka
@@ -202,10 +278,10 @@ Authorization: Bearer <token>
 {
   "by_hour": {
     "0": { "happy": 3, "sad": 1 },
-    "1": { "happy": 2, "neutral": 2 },
+    "1": { "happy": 2, "calm": 2 },
     "8": { "happy": 10, "sad": 3, "angry": 1 },
-    "14": { "happy": 8, "neutral": 5 },
-    "23": { "sad": 4, "neutral": 2 }
+    "14": { "happy": 8, "calm": 5 },
+    "23": { "sad": 4, "calm": 2 }
   }
 }
 ```
@@ -224,9 +300,9 @@ Authorization: Bearer <token>
 ```json
 {
   "by_day": {
-    "0": { "happy": 15, "sad": 5, "neutral": 8 },
-    "1": { "happy": 12, "sad": 7, "neutral": 10 },
-    "6": { "happy": 20, "sad": 3, "neutral": 5 }
+    "0": { "happy": 15, "sad": 5, "calm": 8 },
+    "1": { "happy": 12, "sad": 7, "calm": 10 },
+    "6": { "happy": 20, "sad": 3, "calm": 5 }
   }
 }
 ```
@@ -249,11 +325,10 @@ Authorization: Bearer <token>
   "distribution": {
     "happy": 45.50,
     "sad": 20.30,
-    "neutral": 15.00,
+    "calm": 15.00,
     "angry": 10.20,
     "surprise": 5.00,
-    "fear": 3.00,
-    "disgust": 1.00
+    "stressed": 4.00
   }
 }
 ```
@@ -302,14 +377,50 @@ Backend będzie dostępny na `http://localhost:5000`
 
 ## Spotify Playlists
 
-Backend używa 7 przygotowanych playlist w Spotify dla każdej emocji:
+Backend używa 6 playlist Spotify przechowywanych w bazie danych (tabela `emotion_playlists`):
 
-- **happy**: Happy Hits
-- **sad**: Sad Indie
-- **angry**: Rock Classics
-- **surprise**: Electronic Hits
-- **neutral**: Peaceful Piano
-- **fear**: Dark & Stormy
-- **disgust**: RapCaviar
+| Emocja | Playlist ID | Nazwa |
+|--------|------------|-------|
+| **happy** | `5rVURM4D0xpqfvqW1pHk6Q` | Happy Vibes (feat. Iceland) |
+| **sad** | `0Xy2AujP799aB7ugPdjYkl` | Sad Vibes (feat. Winter) |
+| **angry** | `2jkVRCPWLXyyVUoH5TESDN` | Angry Vibes (feat. Blooming Cactus) |
+| **surprise** | `1EbTcG3TOFCneb6oBq9CMd` | Surprise Vibes |
+| **calm** | `6oruukJQNs89eHY5gGCAXl` | Calm Vibes (feat. In The Autumn Forest) |
+| **stressed** | `4OI3t5sg9143MkUlPK2iZY` | Stressed Vibes |
 
-**TODO:** Zaktualizuj ID playlist w `backend/services/spotify_service.py`
+Playlisty są automatycznie ładowane z bazy danych przez `SpotifyService`.
+
+**Fun fact:** Niektóre playlisty zawierają ambient/acoustic utwory [Matt Krupa](https://mattkrupa.net)
+
+---
+
+## Struktura bazy danych
+
+### Tabele
+
+**emotion_types** - słownik dostępnych emocji
+- `id` - klucz główny
+- `name` - nazwa emocji (np. 'happy', 'sad')
+- `display_name` - nazwa do wyświetlenia
+- `description` - opis emocji
+
+**emotion_playlists** - mapowanie emocji na playlisty Spotify
+- `id` - klucz główny
+- `emotion_type_id` - FK do emotion_types
+- `spotify_playlist_id` - ID playlisty w Spotify
+- `playlist_name` - nazwa playlisty
+- `description` - opis playlisty
+
+**emotions** - historia wykrytych emocji
+- `id` - klucz główny
+- `user_id` - FK do users
+- `emotion_type_id` - FK do emotion_types
+- `confidence` - poziom pewności detekcji
+- `timestamp` - czas detekcji
+- `spotify_playlist_id` - ID playlisty przypisanej do emocji
+
+**users** - użytkownicy
+- `id` - klucz główny
+- `email` - email użytkownika
+- `password_hash` - zahashowane hasło
+- `created_at` - data rejestracji
