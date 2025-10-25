@@ -38,6 +38,7 @@ CREATE TABLE IF NOT EXISTS emotions (
   confidence FLOAT NOT NULL,
   timestamp TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
   spotify_playlist_id VARCHAR(100),
+  user_feedback BOOLEAN DEFAULT NULL,
   CONSTRAINT fk_emotions_user
     FOREIGN KEY (user_id) REFERENCES users(id)
     ON DELETE CASCADE ON UPDATE CASCADE,
