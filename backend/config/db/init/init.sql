@@ -84,7 +84,7 @@ CROSS JOIN LATERAL (
     ('sad', '0Xy2AujP799aB7ugPdjYkl', 'Sad Vibes', 'Melancholic tunes for reflective moments'),
     ('angry', '2jkVRCPWLXyyVUoH5TESDN', 'Angry Vibes', 'Intense music to channel your energy'),
     ('surprise', '1EbTcG3TOFCneb6oBq9CMd', 'Surprise Vibes', 'Unexpected and exciting tracks'),
-    ('fear', '6oruukJQNs89eHY5gGCAXl', 'Fear Vibes', 'Music to calm your fears and anxieties'),
+    ('fear', '6oruukJQNs89eHY5gGCAXl', 'Calm Vibes', 'Music to calm your fears and anxieties'),
     ('disgust', '3waPZEYKqcy8AjnX1sZxd3', 'Disgust Vibes', 'Music to shift your mood'),
     ('neutral', '6oruukJQNs89eHY5gGCAXl', 'Calm Vibes', 'Peaceful music for balanced moments')
 ) AS playlists(emotion_name, spotify_id, name, description)
