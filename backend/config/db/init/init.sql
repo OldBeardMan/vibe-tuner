@@ -59,14 +59,15 @@ CREATE INDEX IF NOT EXISTS idx_emotion_playlists_type_id ON emotion_playlists (e
 -- ADD DATA (idempotent)
 --------------------------------------------
 
--- Insert emotion types
+-- Insert emotion types (DeepFace emotions only)
 INSERT INTO emotion_types (name, display_name, description) VALUES
   ('happy', 'Happy', 'Feeling joyful, cheerful, and content'),
   ('sad', 'Sad', 'Feeling down, melancholic, or blue'),
   ('angry', 'Angry', 'Feeling frustrated, irritated, or mad'),
+  ('fear', 'Fear', 'Feeling scared, anxious, or afraid'),
   ('surprise', 'Surprise', 'Feeling amazed, astonished, or shocked'),
-  ('calm', 'Calm', 'Feeling peaceful, relaxed, and serene'),
-  ('stressed', 'Stressed', 'Feeling anxious, overwhelmed, or tense')
+  ('disgust', 'Disgust', 'Feeling repulsed, disgusted, or averse'),
+  ('neutral', 'Neutral', 'Feeling calm, peaceful, and balanced')
 ON CONFLICT (name) DO NOTHING;
 
 -- Insert emotion playlists (linked to emotion types)
@@ -83,8 +84,9 @@ CROSS JOIN LATERAL (
     ('sad', '0Xy2AujP799aB7ugPdjYkl', 'Sad Vibes', 'Melancholic tunes for reflective moments'),
     ('angry', '2jkVRCPWLXyyVUoH5TESDN', 'Angry Vibes', 'Intense music to channel your energy'),
     ('surprise', '1EbTcG3TOFCneb6oBq9CMd', 'Surprise Vibes', 'Unexpected and exciting tracks'),
-    ('calm', '6oruukJQNs89eHY5gGCAXl', 'Calm Vibes', 'Peaceful music for relaxation'),
-    ('stressed', '4OI3t5sg9143MkUlPK2iZY', 'Stressed Vibes', 'Music to help you unwind and destress')
+    ('fear', '6oruukJQNs89eHY5gGCAXl', 'Fear Vibes', 'Music to calm your fears and anxieties'),
+    ('disgust', '3waPZEYKqcy8AjnX1sZxd3', 'Disgust Vibes', 'Music to shift your mood'),
+    ('neutral', '6oruukJQNs89eHY5gGCAXl', 'Calm Vibes', 'Peaceful music for balanced moments')
 ) AS playlists(emotion_name, spotify_id, name, description)
 WHERE et.name = playlists.emotion_name
 ON CONFLICT (emotion_type_id) DO NOTHING;
