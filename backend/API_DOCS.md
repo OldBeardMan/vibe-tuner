@@ -178,7 +178,8 @@ Authorization: Bearer <token>
       "emotion_display_name": "Happy",
       "confidence": 0.95,
       "timestamp": "2025-01-15T10:30:00",
-      "spotify_playlist_id": "5rVURM4D0xpqfvqW1pHk6Q"
+      "spotify_playlist_id": "5rVURM4D0xpqfvqW1pHk6Q",
+      "user_feedback": true
     }
   ],
   "total": 150,
@@ -205,7 +206,8 @@ Authorization: Bearer <token>
   "emotion_display_name": "Happy",
   "confidence": 0.95,
   "timestamp": "2025-01-15T10:30:00",
-  "spotify_playlist_id": "5rVURM4D0xpqfvqW1pHk6Q"
+  "spotify_playlist_id": "5rVURM4D0xpqfvqW1pHk6Q",
+  "user_feedback": null
 }
 ```
 
@@ -225,6 +227,50 @@ Authorization: Bearer <token>
   "message": "Emotion record deleted successfully"
 }
 ```
+
+### Ustawienie feedbacku użytkownika dla wykrytej emocji
+```
+POST /api/emotion/:id/feedback
+```
+
+Ten endpoint pozwala użytkownikowi potwierdzić lub odrzucić wykrytą emocję.
+
+**Headers:**
+```
+Authorization: Bearer <token>
+Content-Type: application/json
+```
+
+**Body:**
+```json
+{
+  "agrees": true
+}
+```
+
+**Pola:**
+- `agrees` (wymagane): boolean - `true` jeśli użytkownik zgadza się z wykrytą emocją, `false` jeśli nie zgadza się
+
+**Response (200):**
+```json
+{
+  "message": "Feedback saved successfully",
+  "emotion_record": {
+    "id": 123,
+    "emotion": "happy",
+    "emotion_display_name": "Happy",
+    "confidence": 0.95,
+    "timestamp": "2025-01-15T10:30:00",
+    "spotify_playlist_id": "5rVURM4D0xpqfvqW1pHk6Q",
+    "user_feedback": true
+  }
+}
+```
+
+**Uwaga:** Po ustawieniu feedbacku, pole `user_feedback` w rekordzie emocji zostaje zaktualizowane. Możliwe wartości:
+- `null` - brak feedbacku od użytkownika
+- `true` - użytkownik zgadza się z wykrytą emocją
+- `false` - użytkownik nie zgadza się z wykrytą emocją
 
 ### Pobranie dostępnych typów emocji
 ```
@@ -416,6 +462,7 @@ Playlisty są automatycznie ładowane z bazy danych przez `SpotifyService`.
 - `confidence` - poziom pewności detekcji
 - `timestamp` - czas detekcji
 - `spotify_playlist_id` - ID playlisty przypisanej do emocji
+- `user_feedback` - feedback użytkownika (null/true/false)
 
 **users** - użytkownicy
 - `id` - klucz główny

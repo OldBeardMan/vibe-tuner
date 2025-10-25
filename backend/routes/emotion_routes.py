@@ -197,3 +197,52 @@ def get_emotion_types():
 
     except Exception as e:
         return jsonify({'error': f'Failed to fetch emotion types: {str(e)}'}), 500
+
+
+@emotion_bp.route('/emotion/<int:emotion_id>/feedback', methods=['POST'])
+@token_required
+def set_emotion_feedback(emotion_id):
+    """
+    Set user feedback for a detected emotion
+
+    Request body (JSON):
+    {
+        "agrees": true/false  // true = user agrees, false = user disagrees
+    }
+
+    Returns: updated emotion record
+    """
+    try:
+        # Get the emotion record
+        emotion_record = EmotionRecord.query.filter_by(
+            id=emotion_id,
+            user_id=request.current_user.id
+        ).first()
+
+        if not emotion_record:
+            return jsonify({'error': 'Emotion record not found'}), 404
+
+        # Get feedback from request
+        data = request.get_json()
+
+        if 'agrees' not in data:
+            return jsonify({'error': 'Missing "agrees" field in request body'}), 400
+
+        agrees = data.get('agrees')
+
+        # Validate that agrees is a boolean
+        if not isinstance(agrees, bool):
+            return jsonify({'error': '"agrees" field must be a boolean (true or false)'}), 400
+
+        # Update user_feedback
+        emotion_record.user_feedback = agrees
+        db.session.commit()
+
+        return jsonify({
+            'message': 'Feedback saved successfully',
+            'emotion_record': emotion_record.to_dict()
+        }), 200
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': f'Failed to save feedback: {str(e)}'}), 500
