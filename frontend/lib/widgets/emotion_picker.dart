@@ -1,10 +1,16 @@
-import 'package:vibe_tuner/constants/app_sizes.dart';
-import 'package:vibe_tuner/constants/app_strings.dart';
+import 'dart:async';
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:http/http.dart' as http;
+import 'package:vibe_tuner/constants/app_sizes.dart';
+import 'package:vibe_tuner/constants/app_strings.dart';
 import 'package:vibe_tuner/widgets/selected_emotion_dialog.dart';
-import '../constants/mapping/emotion_mapping.dart';
-import '../providers/emotion_provider.dart';
+import '../constants/app_paths.dart';
+import '../providers/auth_provider.dart';
+import 'package:vibe_tuner/models/analyze_result.dart';
+import '../services/api_client.dart';
+import 'package:vibe_tuner/models/emotion.dart';
 
 class EmotionPicker extends StatefulWidget {
   const EmotionPicker({super.key});
@@ -44,9 +50,130 @@ class _EmotionPickerState extends State<EmotionPicker>
     });
   }
 
+  Future<AnalyzeResult> _sendManualEmotionByServerKey(String serverKey) async {
+    final uri = Uri.parse('${ApiClient.instance.baseUrl}${AppPaths.emotionAnalyze}');
+
+    final String? token = context.read<AuthProvider>().token;
+    if (token == null || token.isEmpty) {
+      return AnalyzeResult(
+        id: -1,
+        emotion: AppStrings.unknown,
+        confidence: null,
+        playlist: null,
+        timestamp: DateTime.now(),
+        raw: {'error': 'unauthorized'},
+      );
+    }
+
+    final headers = <String, String>{
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $token',
+    };
+    final body = jsonEncode({'emotion': serverKey});
+
+    try {
+      final resp = await http
+          .post(uri, headers: headers, body: body)
+          .timeout(const Duration(seconds: 30));
+
+      if (resp.statusCode >= 200 && resp.statusCode < 300) {
+        if (resp.body.isEmpty) {
+          return AnalyzeResult(
+            id: null,
+            emotion: AppStrings.unknown,
+            confidence: null,
+            playlist: null,
+            timestamp: DateTime.now(),
+            raw: {'note': 'empty_body'},
+          );
+        }
+        try {
+          final Map<String, dynamic> j =
+          jsonDecode(resp.body) as Map<String, dynamic>;
+          return AnalyzeResult.fromJson(j);
+        } catch (_) {
+          return AnalyzeResult(
+            id: -1,
+            emotion: AppStrings.unknown,
+            confidence: null,
+            playlist: null,
+            timestamp: DateTime.now(),
+            raw: {'error': 'invalid_json', 'body': resp.body},
+          );
+        }
+      }
+
+      if (resp.statusCode == 401) {
+        return AnalyzeResult(
+          id: -1,
+          emotion: AppStrings.unknown,
+          confidence: null,
+          playlist: null,
+          timestamp: DateTime.now(),
+          raw: {
+            'error': 'unauthorized',
+            'status': resp.statusCode,
+            'body': resp.body
+          },
+        );
+      }
+
+      try {
+        final Map<String, dynamic> j =
+        jsonDecode(resp.body) as Map<String, dynamic>;
+        if (j.containsKey('emotion') ||
+            j.containsKey('playlist') ||
+            j.containsKey('songs') ||
+            j.containsKey('emotionCode')) {
+          return AnalyzeResult.fromJson(j);
+        }
+      } catch (_) {}
+
+      return AnalyzeResult(
+        id: -1,
+        emotion: AppStrings.unknown,
+        confidence: null,
+        playlist: null,
+        timestamp: DateTime.now(),
+        raw: {
+          'error': 'manual_rejected',
+          'status': resp.statusCode,
+          'body': resp.body
+        },
+      );
+    } on TimeoutException {
+      return AnalyzeResult(
+        id: -1,
+        emotion: AppStrings.unknown,
+        confidence: null,
+        playlist: null,
+        timestamp: DateTime.now(),
+        raw: {'error': 'timeout'},
+      );
+    } on http.ClientException {
+      return AnalyzeResult(
+        id: -1,
+        emotion: AppStrings.unknown,
+        confidence: null,
+        playlist: null,
+        timestamp: DateTime.now(),
+        raw: {'error': 'network'},
+      );
+    } catch (e) {
+      return AnalyzeResult(
+        id: -1,
+        emotion: AppStrings.unknown,
+        confidence: null,
+        playlist: null,
+        timestamp: DateTime.now(),
+        raw: {'error': 'unknown', 'message': e.toString()},
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final emoProv = Provider.of<EmotionProvider>(context);
+    const emotions = Emotion.all;
 
     return AnimatedContainer(
       duration: const Duration(milliseconds: 300),
@@ -95,13 +222,15 @@ class _EmotionPickerState extends State<EmotionPicker>
                 mainAxisSpacing: 4,
                 crossAxisSpacing: 4,
                 childAspectRatio: 2.6,
-                children: emoProv.emotions.map((emotion) {
+                children: emotions.map((emotion) {
                   return Padding(
                     padding: const EdgeInsets.all(6),
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Theme.of(context).colorScheme.primaryContainer,
-                        foregroundColor: Theme.of(context).colorScheme.onPrimaryContainer,
+                        backgroundColor:
+                        Theme.of(context).colorScheme.primaryContainer,
+                        foregroundColor:
+                        Theme.of(context).colorScheme.onPrimaryContainer,
                         padding: EdgeInsets.zero,
                         minimumSize: const Size(0, 32),
                         elevation: 2,
@@ -111,7 +240,8 @@ class _EmotionPickerState extends State<EmotionPicker>
                         ),
                       ),
                       onPressed: () {
-                        final code = emotionCodeFromName(emotion);
+                        final serverKey = emotion.serverKey; // canonical key
+                        final future = _sendManualEmotionByServerKey(serverKey);
 
                         showGeneralDialog(
                           context: context,
@@ -120,14 +250,14 @@ class _EmotionPickerState extends State<EmotionPicker>
                           barrierColor: Colors.black.withValues(alpha: 0.4),
                           pageBuilder: (context, anim1, anim2) {
                             return Center(
-                              child: SelectedEmotionDialog(emotionCode: code),
+                              child: SelectedEmotionDialog(responseFuture: future),
                             );
                           },
                         );
                         _toggleExpanded();
                       },
                       child: Text(
-                        emotion,
+                        emotion.localName,
                         style: const TextStyle(fontSize: 13),
                         textAlign: TextAlign.center,
                       ),

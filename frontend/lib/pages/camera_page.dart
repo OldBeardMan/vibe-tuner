@@ -6,6 +6,7 @@ import 'package:flutter/scheduler.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:vibe_tuner/constants/app_paths.dart';
+import 'package:vibe_tuner/providers/auth_provider.dart';
 import 'package:vibe_tuner/providers/camera_provider.dart';
 import 'package:vibe_tuner/widgets/selected_emotion_dialog.dart';
 
@@ -193,10 +194,13 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
                       GestureDetector(
                         onTap: (p.isBusy || p.isSending) ? null : () {
                           try {
-                            final Future<int> sendFuture = p.sendCapturedImage();
+                            final Future<dynamic> sendFuture = p.sendCapturedImage(token: context.read<AuthProvider>().token);
                             p.reset();
+
+                            // wróć do ekranu głównego zanim dialog się pokaże (jak miałeś)
                             context.go(AppPaths.homePage);
 
+                            // pokaż dialog który będzie czekał na sendFuture
                             SchedulerBinding.instance.addPostFrameCallback((_) {
                               showGeneralDialog(
                                 context: context,
@@ -209,7 +213,8 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
                               );
                             });
                           } catch (e) {
-                            // ignore
+                            // opcjonalnie: loguj
+                            // debugPrint('send error: $e');
                           }
                         },
                         child: Container(

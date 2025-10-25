@@ -6,6 +6,7 @@ import 'package:vibe_tuner/pages/recommended_songs_page.dart';
 import 'package:vibe_tuner/pages/register_page.dart';
 import 'package:vibe_tuner/widgets/selected_emotion_dialog.dart';
 import 'constants/app_strings.dart';
+import 'models/navigation_args.dart';
 import 'pages/login_page.dart';
 import 'pages/home_page.dart';
 import 'pages/settings_page.dart';
@@ -59,11 +60,12 @@ final GoRouter router = GoRouter(
         GoRoute(
           path: AppPaths.recommendedSongsPage,
           builder: (context, state) {
-            final q = state.uri.queryParameters['emotion'];
-            final code = q != null ? int.tryParse(q) ?? 4 : 4;
-            return RecommendedSongsPage(emotionCode: code);
+            final args = state.extra as RecommendedSongsArgs?;
+            if (args == null) return const Scaffold(body: Center(child: Text('Brak danych rekomendacji')));
+            return RecommendedSongsPage(args: args);
           },
         ),
+
         GoRoute(path: AppPaths.emotionDialog, builder: (context, state) => const SelectedEmotionDialog()),
         GoRoute(path: AppPaths.cameraPage, builder: (context, state) => const CameraPage()),
         GoRoute(path: '/register', builder: (context, state) => const RegisterPage()),

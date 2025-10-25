@@ -5,7 +5,7 @@ import 'package:vibe_tuner/constants/app_paths.dart';
 import 'package:vibe_tuner/constants/app_strings.dart';
 
 import '../constants/app_sizes.dart';
-import '../constants/mock/history_card_mock.dart';
+import '../assets/mock/history_card_mock.dart';
 
 class HistoryPage extends StatelessWidget {
   const HistoryPage({super.key});

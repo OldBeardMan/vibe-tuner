@@ -184,8 +184,6 @@ class _LoginPageState extends State<LoginPage> {
               },
             ),
 
-            ElevatedButton(onPressed: () => context.go(AppPaths.homePage), child: const Text("Next")),
-
             Padding(
               padding: const EdgeInsets.only(bottom: 18.0),
               child: Row(
