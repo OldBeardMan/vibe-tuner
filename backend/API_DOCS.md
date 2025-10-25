@@ -106,7 +106,7 @@ Content-Type: application/json
 ```
 
 **Pola:**
-- `emotion` (wymagane): nazwa emocji (`happy`, `sad`, `angry`, `surprise`, `calm`, `stressed`)
+- `emotion` (wymagane): nazwa emocji (`happy`, `sad`, `angry`, `fear`, `surprise`, `disgust`, `neutral`)
 - `confidence` (opcjonalne): poziom pewności (0.0-1.0), domyślnie 1.0
 
 **Przykład (curl):**
@@ -146,12 +146,9 @@ curl -X POST http://localhost:5000/api/emotion/analyze \
 }
 ```
 
-**Możliwe emocje:** `happy`, `sad`, `angry`, `surprise`, `calm`, `stressed`
+**Możliwe emocje:** `happy`, `sad`, `angry`, `fear`, `surprise`, `disgust`, `neutral`
 
-**Uwaga:** Emocje są przechowywane w bazie danych w tabeli `emotion_types`. W trybie analizy zdjęcia, DeepFace wykrywa emocje (`happy`, `sad`, `angry`, `fear`, `surprise`, `disgust`, `neutral`), które są mapowane na dostępne emocje:
-- `fear` → `stressed`
-- `disgust` → `angry`
-- `neutral` → `calm`
+**Uwaga:** Emocje są przechowywane w bazie danych w tabeli `emotion_types`. System używa bezpośrednio emocji wykrywanych przez DeepFace bez mapowania.
 
 ---
 
@@ -377,16 +374,17 @@ Backend będzie dostępny na `http://localhost:5000`
 
 ## Spotify Playlists
 
-Backend używa 6 playlist Spotify przechowywanych w bazie danych (tabela `emotion_playlists`):
+Backend używa 6 playlist Spotify (playlista calm vibes jest jednocześnie dla emocji neutral i fear) przechowywanych w bazie danych (tabela `emotion_playlists`):
 
 | Emocja | Playlist ID | Nazwa |
 |--------|------------|-------|
 | **happy** | `5rVURM4D0xpqfvqW1pHk6Q` | Happy Vibes (feat. Iceland) |
 | **sad** | `0Xy2AujP799aB7ugPdjYkl` | Sad Vibes (feat. Winter) |
 | **angry** | `2jkVRCPWLXyyVUoH5TESDN` | Angry Vibes (feat. Blooming Cactus) |
+| **fear** | `6oruukJQNs89eHY5gGCAXl` | Calm Vibes |
 | **surprise** | `1EbTcG3TOFCneb6oBq9CMd` | Surprise Vibes |
-| **calm** | `6oruukJQNs89eHY5gGCAXl` | Calm Vibes (feat. In The Autumn Forest) |
-| **stressed** | `4OI3t5sg9143MkUlPK2iZY` | Stressed Vibes |
+| **disgust** | `3waPZEYKqcy8AjnX1sZxd3` | Disgust Vibes |
+| **neutral** | `6oruukJQNs89eHY5gGCAXl` | Calm Vibes (feat. In The Autumn Forest) |
 
 Playlisty są automatycznie ładowane z bazy danych przez `SpotifyService`.
 
