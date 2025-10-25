@@ -24,6 +24,8 @@ dependencies:
   shared_preferences: ^2.0.0
   http: ^1.5.0
   flutter_secure_storage: ^8.0.0
+  http_parser: ^4.0.0
+  path: ^1.8.2
 
 dev_dependencies:
   flutter_test:
@@ -37,4 +39,3 @@ flutter:
   assets:
     - lib/assets/icons/
     - lib/assets/mock/response/recommended_emotion/
-    - lib/assets/mock/response/recommended_songs/

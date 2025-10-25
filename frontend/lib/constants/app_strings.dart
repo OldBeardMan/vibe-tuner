@@ -2,9 +2,10 @@ class AppStrings {
   static const emotionHappy = "szczęśliwy";
   static const emotionSad = "smutny";
   static const emotionAngry = "zły";
-  static const emotionShocked = "zaskoczony";
-  static const emotionCalm = "spokojny";
-  static const emotionStressed = "zestresowany";
+  static const emotionSurprised = "zaskoczony";
+  static const emotionFear = "przestraszony";
+  static const emotionDisgust = "wstręt";
+  static const emotionNeutral= "neutralny";
 
   static const settings = "Ustawienia";
   static const homePage = "Strona główna";
@@ -91,4 +92,14 @@ class AppStrings {
   static const signedIn = "Zarejestrowano. Możesz się zalogować.";
   static const logOut = "Wyloguj";
   static const logOut2 = "Wyloguj się";
+
+  // Recommendation
+  static const errorDefault = 'Wystąpił błąd. Spróbuj ponownie.';
+  static const errorManualRejected = 'Ręczny wybór emocji nie został przyjęty przez serwer. Spróbuj ponownie.';
+  static const errorDetectionFailed = 'Nie wykryto twarzy ani emocji na zdjęciu. Zrób zdjęcie w lepszym świetle i upewnij się, że twarz jest widoczna.';
+  static const errorNoNetwork = 'Brak połączenia. Sprawdź sieć i spróbuj ponownie.';
+  static const errorTimeout = 'Serwer nie odpowiada. Spróbuj ponownie później.';
+  static const errorInvalidJson = 'Serwer zwrócił nieprawidłową odpowiedź.';
+  static const errorUnauthorized = 'Brak autoryzacji. Zaloguj się ponownie.';
+  static const errorUnknown = 'Wystąpił nieznany błąd. Spróbuj ponownie.';
 }

@@ -1,13 +1,21 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:typed_data';
+import 'dart:io';
 
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:image/image.dart' as img;
+import 'package:path/path.dart' as p;
+import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
 import 'package:image_picker/image_picker.dart';
+
+import '../constants/app_paths.dart';
+import '../constants/app_strings.dart';
+import '../models/analyze_result.dart';
+import '../services/api_client.dart';
 
 class CameraProvider extends ChangeNotifier {
   final ImagePicker _picker = ImagePicker();
@@ -185,58 +193,138 @@ class CameraProvider extends ChangeNotifier {
     });
   }
 
-  Future<Uint8List> _prepareImageAsPngBytes(XFile file) async {
-    try {
-      final bytes = await file.readAsBytes();
-      if (bytes.length >= 8 &&
-          bytes[0] == 0x89 &&
-          bytes[1] == 0x50 &&
-          bytes[2] == 0x4E &&
-          bytes[3] == 0x47) {
-        return bytes; // already PNG
-      }
-
-      final decoded = img.decodeImage(bytes);
-      if (decoded == null) return bytes;
-      final png = img.encodePng(decoded);
-      return Uint8List.fromList(png);
-    } catch (e) {
-      return await file.readAsBytes();
-    }
-  }
-
-  // TODO
-  Future<int> sendCapturedImage() async {
-    final XFile? file = capturedFile; // lokalna kopia referencji
+  Future<AnalyzeResult> sendCapturedImage({String? token}) async {
+    final XFile? file = capturedFile;
     if (file == null) throw Exception('No image to send');
 
-    // oznaczamy, że trwa wysyłka (UI może blokować przycisk)
     isSending = true;
     notifyListeners();
 
     try {
-      // opcjonalna sztuczna latencja (symulacja network)
-      await Future.delayed(const Duration(milliseconds: 3000));
+      final uri = Uri.parse('${ApiClient.instance.baseUrl}${AppPaths.emotionAnalyze}');
+      final originalBytes = await file.readAsBytes();
+      final filename = p.basename(file.path);
+      final initialMediaType = _guessImageMediaType(file.path);
 
-      // TU: jeśli chcesz, możesz wysłać prawdziwe bytes:
-      // final bytes = await _prepareImageAsPngBytes(file);
-      // await api.upload(bytes);
-
-      // symulowana odpowiedź: odczytujemy plik JSON z assets
-      const path = 'lib/assets/mock/response/recommended_emotion/emotion.json';
-      try {
-        final raw = await rootBundle.loadString(path);
-        final Map<String, dynamic> json = jsonDecode(raw) as Map<String, dynamic>;
-        final int emotionCode = (json['emotionCode'] ?? 4) as int;
-        return emotionCode;
-      } catch (e) {
-        // jeśli coś nie pójdzie z JSONem -> fallback na wartość domyślną
-        return 4;
+      Future<http.Response> _doSend(Uint8List bytes, String name, MediaType ct) async {
+        final req = http.MultipartRequest('POST', uri);
+        if (token?.isNotEmpty == true) req.headers['Authorization'] = 'Bearer $token';
+        req.files.add(http.MultipartFile.fromBytes('image', bytes, filename: name, contentType: ct));
+        final streamed = await req.send().timeout(const Duration(seconds: 30));
+        return await http.Response.fromStream(streamed);
       }
+
+      // 1) pierwsze wysłanie oryginalnego pliku
+      http.Response resp = await _doSend(originalBytes, filename, initialMediaType);
+
+      // 2) jeśli serwer zwrócił 400 z treścią mówiącą o braku detekcji twarzy, spróbuj jednokrotnej normalizacji i resend
+      if (resp.statusCode == 400) {
+        final bodyLower = resp.body.toLowerCase() ?? '';
+        if (bodyLower.contains('could not detect') || bodyLower.contains('no face') || bodyLower.contains('could not detect face')) {
+          try {
+            final decoded = img.decodeImage(originalBytes);
+            if (decoded != null) {
+              const int maxDim = 1600;
+              img.Image proc = decoded;
+              if (proc.width > maxDim || proc.height > maxDim) {
+                proc = img.copyResize(proc,
+                    width: proc.width > proc.height ? maxDim : null,
+                    height: proc.height >= proc.width ? maxDim : null);
+              }
+              final jpgBytes = Uint8List.fromList(img.encodeJpg(proc, quality: 90));
+              final jpgName = p.setExtension(filename, '.jpg');
+              resp = await _doSend(jpgBytes, jpgName, MediaType('image', 'jpeg'));
+            }
+          } catch (_) {
+            // jeśli normalizacja się nie powiedzie -> przejdziemy do zwrócenia failure
+          }
+        }
+      }
+
+      // 3) obsługa odpowiedzi
+      if (resp.statusCode >= 200 && resp.statusCode < 300) {
+        if (resp.body.isEmpty) {
+          return AnalyzeResult(
+            id: null,
+            emotion: AppStrings.unknown,
+            confidence: null,
+            playlist: null,
+            timestamp: DateTime.now(),
+            raw: {'note': 'empty_body'},
+          );
+        }
+        try {
+          final Map<String, dynamic> j = jsonDecode(resp.body) as Map<String, dynamic>;
+          return AnalyzeResult.fromJson(j);
+        } catch (_) {
+          return AnalyzeResult(
+            id: -1,
+            emotion: AppStrings.unknown,
+            confidence: null,
+            playlist: null,
+            timestamp: DateTime.now(),
+            raw: {'error': 'invalid_json', 'body': resp.body},
+          );
+        }
+      }
+
+      // 4) non-2xx -> jeśli struktura zawiera użyteczne pola, zwróć ją, inaczej zwróć failure result
+      try {
+        final Map<String, dynamic> j = jsonDecode(resp.body) as Map<String, dynamic>;
+        if (j.containsKey('emotion') || j.containsKey('playlist') || j.containsKey('songs') || j.containsKey('emotionCode')) {
+          return AnalyzeResult.fromJson(j);
+        }
+      } catch (_) {}
+      // final failure result oznaczający, że detekcja się nie powiodła
+      return AnalyzeResult(
+        id: -1,
+        emotion: AppStrings.unknown,
+        confidence: null,
+        playlist: null,
+        timestamp: DateTime.now(),
+        raw: {'error': 'detection_failed'},
+      );
+    } on SocketException catch (_) {
+      return AnalyzeResult(
+        id: -1,
+        emotion: AppStrings.unknown,
+        confidence: null,
+        playlist: null,
+        timestamp: DateTime.now(),
+        raw: {'error': 'network'},
+      );
+    } on TimeoutException catch (_) {
+      return AnalyzeResult(
+        id: -1,
+        emotion: AppStrings.unknown,
+        confidence: null,
+        playlist: null,
+        timestamp: DateTime.now(),
+        raw: {'error': 'timeout'},
+      );
+    } catch (e) {
+      return AnalyzeResult(
+        id: -1,
+        emotion: AppStrings.unknown,
+        confidence: null,
+        playlist: null,
+        timestamp: DateTime.now(),
+        raw: {'error': 'unknown', 'message': e.toString()},
+      );
     } finally {
       isSending = false;
       notifyListeners();
     }
+  }
+
+  MediaType _guessImageMediaType(String path) {
+    final l = path.toLowerCase();
+    if (l.endsWith('.png')) return MediaType('image', 'png');
+    if (l.endsWith('.jpg') || l.endsWith('.jpeg')) return MediaType('image', 'jpeg');
+    if (l.endsWith('.webp')) return MediaType('image', 'webp');
+    if (l.endsWith('.heic')) return MediaType('image', 'heic');
+    if (l.endsWith('.avif')) return MediaType('image', 'avif');
+    return MediaType('image', 'jpeg');
   }
 
   void retake() {

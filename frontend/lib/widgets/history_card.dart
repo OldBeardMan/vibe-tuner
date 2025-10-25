@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
 import '../constants/app_sizes.dart';
-import '../constants/mapping/emotion_mapping.dart';
+import '../models/emotion.dart';
 
 class Song {
   final String title;
@@ -60,8 +60,10 @@ class _HistoryCardState extends State<HistoryCard>
     final borderColor = theme.colorScheme.onSurface;
     final textColor = theme.colorScheme.onSurface;
 
-    final iconLink = emotionEmojiIcons[widget.emotionCode];
-    final emotion = emotionNames[widget.emotionCode];
+    final em = Emotion.fromId(widget.emotionCode);
+    final iconLink = em.icon;
+    final emotion = em.localName;
+
 
     return Padding(
       padding: const EdgeInsets.symmetric(
@@ -96,7 +98,7 @@ class _HistoryCardState extends State<HistoryCard>
                   ),
                   child: Center(
                     child: SvgPicture.asset(
-                      iconLink!,
+                      iconLink,
                       width: AppSizes.historyCardIconSize,
                       height: AppSizes.historyCardIconSize,
                       colorFilter: ColorFilter.mode(borderColor, BlendMode.srcIn),
@@ -116,7 +118,7 @@ class _HistoryCardState extends State<HistoryCard>
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            emotion!,
+                            emotion,
                             style: theme.textTheme.titleMedium?.copyWith(
                               fontWeight: FontWeight.w700,
                               color: textColor,
