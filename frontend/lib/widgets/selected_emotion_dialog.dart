@@ -74,7 +74,7 @@ class _SelectedEmotionDialogState extends State<SelectedEmotionDialog> {
     if (s.contains('network')) return AppStrings.errorNoNetwork;
     if (s.contains('timeout')) return AppStrings.errorTimeout;
     if (s.contains('invalid_json')) return AppStrings.errorInvalidJson;
-    if (s.contains('unauthorized') || s.contains('401')) return AppStrings.errorUnauthorized;
+    if (s.contains('unauthorized') || s.contains('401')) return '${AppStrings.errorUnauthorized} ${AppStrings.errorLoginAgain}';
     if (s.contains('unknown')) return AppStrings.errorUnknown;
     if (s.length < 200) return codeOrMessage;
     return AppStrings.errorDefault;
@@ -88,13 +88,11 @@ class _SelectedEmotionDialogState extends State<SelectedEmotionDialog> {
 
   _SelectedEmotionResponse _robustParseResponse(dynamic res) {
     try {
-      // 0) AnalyzeResult — preferowane
       if (res is AnalyzeResult) {
-        final emoRaw = (res.emotion ?? '').trim();
+        final emoRaw = (res.emotion).trim();
         final generated = res.timestamp ?? DateTime.now();
         final tracks = res.playlist?.tracks ?? <Track>[];
 
-        // try server key first, then local name
         final byServer = Emotion.tryFromServerKey(emoRaw);
         if (byServer != null) {
           return _SelectedEmotionResponse(
@@ -114,7 +112,6 @@ class _SelectedEmotionDialogState extends State<SelectedEmotionDialog> {
           );
         }
 
-        // fallback: return default but include tracks/timestamp so UI can show playlist
         return _SelectedEmotionResponse(
           emotionCode: Emotion.defaultEmotion.id,
           emotionName: Emotion.defaultEmotion.localName,

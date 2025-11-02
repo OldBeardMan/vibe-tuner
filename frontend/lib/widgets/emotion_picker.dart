@@ -19,8 +19,7 @@ class EmotionPicker extends StatefulWidget {
   State<EmotionPicker> createState() => _EmotionPickerState();
 }
 
-class _EmotionPickerState extends State<EmotionPicker>
-    with SingleTickerProviderStateMixin {
+class _EmotionPickerState extends State<EmotionPicker> with SingleTickerProviderStateMixin {
   bool _expanded = false;
   late final AnimationController _controller;
   late final Animation<double> _arrowAnimation;

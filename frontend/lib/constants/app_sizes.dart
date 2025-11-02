@@ -1,10 +1,17 @@
 import 'dart:ui';
 
+import 'package:flutter/cupertino.dart';
+
 class AppSizes {
   // Shared
   static const double titleFontSize = 28.0;
   static const double buttonBorderRadius = 8.0;
   static const double bigIconSize = 110.0;
+  static const double pageFieldCornerRadius = 12.0;
+  static const double pageFieldCornerRadiusSmall = 8.0;
+  static const double pageSmallGap = 8.0;
+  static const double pageNormalGap = 12.0;
+  static const double pageLargeGap = 32.0;
 
   static const double expandableCardRadius = 14.0;
   static const double expandableCardPadding = 14.0;
@@ -76,12 +83,6 @@ class AppSizes {
   static const double loginPageTopSpacer = 12.0;
   static const double loginPageLargeSpacer = 32.0;
 
-  // static const double logoutPageCardPaddingHorizontal = expandableCardPadding;
-  // static const double logoutPageCardPaddingTop = expandableCardPaddingBetween;
-  // static const double logoutPageCardPaddingInside = expandableCardPaddingInside;
-  // static const double logoutPageCardRadius = expandableCardRadius;
-  // static const double logoutPageCardShadowBlur = expandableCardBlurRadius;
-  // static const Offset logoutPageCardShadowOffset = expandableCardBlurOffset;
   static const double logoutPageDialogWidth = 340.0;
   static const double logoutPageDialogPadding = 18.0;
   static const double logoutPageDialogCornerRadius = 12.0;
@@ -104,8 +105,36 @@ class AppSizes {
   static const double animatedBannerCloseIconSize = 18.0;
   static const double animatedBannerBorderOpacity = 0.18;
 
-  static const double pageFieldCornerRadius = 12.0;
-  static const double pageSmallGap = 8.0;
-  static const double pageNormalGap = 12.0;
-  static const double pageLargeGap = 32.0;
+
+  static const analyticsPageInitialSelectedEmotionsInCharts = 3;
+  static const analyticsPageInitialSelectedEmotionsInList = 5;
+  static const analyticsPageInitialMostCommonEmotions = 3;
+  static const double analyticsPageTabBarUnselectLabelOpacity = 0.5;
+  static const double analyticsPageComponentsPadding = 14.0;
+  static const analyticsPageComponentsPadding2 = EdgeInsets.symmetric(vertical: 8.0, horizontal: 12.0);
+  static const analyticsPageComponentsTitlePadding = EdgeInsets.symmetric(horizontal: 8.0, vertical: 6);
+  static const double analyticsCardIconSize = 18.0;
+  static const double analyticsCardElevation = 2.0;
+
+  static const double analyticsCardEmotionPercentHeight = 200.0;
+  static const double analyticsCardEmotionChartSectionSpace = 6;
+  static const double analyticsCardEmotionChartCenterSpaceRadius = 36;
+  static const double analyticsCardEmotionLegendSpacing = 8;
+  static const double analyticsCardEmotionChartRadius = 50;
+  static const double analyticsCardEmotionChartRadiusTouched = 60;
+  static const double analyticsCardEmotionChartFontRadius = 12;
+  static const double analyticsCardEmotionChartFontRadiusTouched = 14;
+  static const double analyticsCardMostEmotionsContainerSize = 44.0;
+  static const double analyticsCardMostEmotionsSmallPadding = 4.0;
+  static const double analyticsCardMostEmotionsFontSize = 10.0;
+  static const double analyticsCardChartAspectRadio = 1.8;
+  static const double analyticsCardChartBarWidth = 2.8;
+  static const double analyticsCardHourlyMaxYMultiplier = 1.05;
+  static const double analyticsCardHourlyTooltipFontSize = 12.0;
+  static const double analyticsCardHourlyLeftReservedSize = 36.0;
+  static const double analyticsCardMostActiveEmotionCont = 32.0;
+  static const double analyticsCardMostActiveEmotionHourCont = 52.0;
+  static const double analyticsCardMostActiveEmotionImage = 24.0;
+  static const double analyticsCardMostActiveEmotionLine = 10.0;
+  static const double analyticsCardWeeklyTotalHeight = 220.0;
 }
