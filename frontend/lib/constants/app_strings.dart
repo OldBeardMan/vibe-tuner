@@ -7,7 +7,7 @@ class AppStrings {
   static const emotionDisgust = "wstręt";
   static const emotionNeutral= "neutralny";
 
-  static const settings = "Ustawienia";
+  static const analytics = "Analityka";
   static const homePage = "Strona główna";
   static const history = "Historia";
   static const profile = "Profil";
@@ -20,7 +20,7 @@ class AppStrings {
   static const homePageOr = "lub";
   static const homePageManuallySelectingEmotionsButton = "Wybierz emocję ręcznie";
 
-  // Settings page
+  // Settings widgets
   static const settingsPageFaqQuestions = [
     "Czy moje zdjęcia są gdzieś zapisywane?",
     "Jak aplikacja rozpoznaje emocje?",
@@ -93,13 +93,32 @@ class AppStrings {
   static const logOut = "Wyloguj";
   static const logOut2 = "Wyloguj się";
 
-  // Recommendation
+  // Errors
   static const errorDefault = 'Wystąpił błąd. Spróbuj ponownie.';
   static const errorManualRejected = 'Ręczny wybór emocji nie został przyjęty przez serwer. Spróbuj ponownie.';
   static const errorDetectionFailed = 'Nie wykryto twarzy ani emocji na zdjęciu. Zrób zdjęcie w lepszym świetle i upewnij się, że twarz jest widoczna.';
   static const errorNoNetwork = 'Brak połączenia. Sprawdź sieć i spróbuj ponownie.';
   static const errorTimeout = 'Serwer nie odpowiada. Spróbuj ponownie później.';
   static const errorInvalidJson = 'Serwer zwrócił nieprawidłową odpowiedź.';
-  static const errorUnauthorized = 'Brak autoryzacji. Zaloguj się ponownie.';
+  static const errorUnauthorized = 'Brak autoryzacji.';
+  static const errorLoginAgain = 'Zaloguj się ponownie.';
   static const errorUnknown = 'Wystąpił nieznany błąd. Spróbuj ponownie.';
+
+  // Analytics
+  static const analyticsPageOverview = 'Przegląd';
+  static const analyticsPageHourly = 'Godzinowo';
+  static const analyticsPageWeekly = 'Tygodniowo';
+  static const analyticsPageNoData = 'Brak danych';
+
+  static const analyticsCardEmotionPercentTitle = 'Rozkład procentowy emocji';
+  static const analyticsCardEmotionTotalTitle = 'Liczba wszystkich wpisów';
+  static const analyticsCardEmotionHourlyTitle = 'Rozkład emocji po godzinach';
+  static const analyticsCardEmotionMostActiveHoursTitle = 'Najbardziej aktywne godziny';
+  static const analyticsCardEmotionWeeklyTitle = 'Rozkład emocji po dniach tygodnia';
+  static const analyticsCardEmotionWeeklyTotalTitle = 'Suma emocji na dzień tygodnia';
+  static const analyticsCardEmotionTotalEntries = 'wpisów';
+  static const analyticsCardEmotionMostCommonEmotions = 'Najczęstsze emocje';
+  static const analyticsCardEmotionTopTwo = '2';
+  static const analyticsCardEmotionTopThree = '3';
+  static final analyticsCardWeeklyLabels = ['Pn','Wt','Śr','Cz','Pt','So','Nd'];
 }

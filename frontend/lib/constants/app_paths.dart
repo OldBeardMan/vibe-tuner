@@ -5,7 +5,7 @@ class AppPaths {
   static const homePage = "/home";
   static const userPage = "/user";
   static const historyPage = "/history";
-  static const settingsPage = "/settings";
+  static const analyticsPage = "/analytics";
   static const recommendedSongsPage = "/recommendedSongs";
   static const emotionDialog = "/emotionDialog";
   static const cameraPage = "/camera";
@@ -17,6 +17,9 @@ class AppPaths {
   static const register = "/auth/register";
   static const login = "/auth/login";
   static const emotionAnalyze = "/emotion/analyze";
+  static const analyticsDistribution = '/analytics/distribution';
+  static const analyticsByDay = '/analytics/by-day';
+  static const analyticsByHour = '/analytics/by-hour';
 
   // Icons
   static const emotionHappy = 'lib/assets/icons/sentiment_very_satisfied.svg';

@@ -9,7 +9,7 @@ import 'constants/app_strings.dart';
 import 'models/navigation_args.dart';
 import 'pages/login_page.dart';
 import 'pages/home_page.dart';
-import 'pages/settings_page.dart';
+import 'pages/analytics_page.dart';
 import 'pages/history_page.dart';
 import 'pages/user_page.dart';
 
@@ -21,7 +21,7 @@ final GoRouter router = GoRouter(
       builder: (context, state, child) {
         final location = state.uri.toString();
         int currentIndex = 1;
-        if (location.startsWith(AppPaths.settingsPage)) {
+        if (location.startsWith(AppPaths.analyticsPage)) {
           currentIndex = 0;
         } else if (location.startsWith(AppPaths.homePage)) {
           currentIndex = 1;
@@ -41,12 +41,12 @@ final GoRouter router = GoRouter(
           bottomNavigationBar: showBottomBar ? BottomNavigationBar(
             currentIndex: currentIndex,
             onTap: (index) {
-              if (index == 0) context.go(AppPaths.settingsPage);
+              if (index == 0) context.go(AppPaths.analyticsPage);
               if (index == 1) context.go(AppPaths.homePage);
               if (index == 2) context.go(AppPaths.historyPage);
             },
             items: const [
-              BottomNavigationBarItem(icon: Icon(Icons.settings), label: AppStrings.settings),
+              BottomNavigationBarItem(icon: Icon(Icons.analytics_outlined), label: AppStrings.analytics),
               BottomNavigationBarItem(icon: Icon(Icons.home), label: AppStrings.homePage),
               BottomNavigationBarItem(icon: Icon(Icons.calendar_today), label: AppStrings.history),
             ],
@@ -55,7 +55,7 @@ final GoRouter router = GoRouter(
       },
       routes: [
         GoRoute(path: AppPaths.homePage, builder: (context, state) => const HomePage()),
-        GoRoute(path: AppPaths.settingsPage, builder: (context, state) => const SettingsPage()),
+        GoRoute(path: AppPaths.analyticsPage, builder: (context, state) => const AnalyticsPage()),
         GoRoute(path: AppPaths.historyPage, builder: (context, state) => const HistoryPage()),
         GoRoute(
           path: AppPaths.recommendedSongsPage,
@@ -68,7 +68,7 @@ final GoRouter router = GoRouter(
 
         GoRoute(path: AppPaths.emotionDialog, builder: (context, state) => const SelectedEmotionDialog()),
         GoRoute(path: AppPaths.cameraPage, builder: (context, state) => const CameraPage()),
-        GoRoute(path: '/register', builder: (context, state) => const RegisterPage()),
+        GoRoute(path: AppPaths.registerPage, builder: (context, state) => const RegisterPage()),
         GoRoute(path: AppPaths.baseLocation, builder: (context, state) => const LoginPage()),
       ],
     ),
