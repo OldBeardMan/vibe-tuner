@@ -1,5 +1,5 @@
-from datetime import datetime
 from models.database import db
+from config.settings import get_polish_time
 
 class EmotionType(db.Model):
     __tablename__ = 'emotion_types'
@@ -8,7 +8,7 @@ class EmotionType(db.Model):
     name = db.Column(db.String(50), unique=True, nullable=False, index=True)
     display_name = db.Column(db.String(100), nullable=False)
     description = db.Column(db.Text, nullable=True)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    created_at = db.Column(db.DateTime, default=get_polish_time, nullable=False)
 
     # Relationships
     emotion_records = db.relationship('EmotionRecord', backref='emotion_type', lazy=True)

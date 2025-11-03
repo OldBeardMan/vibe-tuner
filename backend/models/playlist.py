@@ -1,5 +1,5 @@
-from datetime import datetime
 from models.database import db
+from config.settings import get_polish_time
 
 class EmotionPlaylist(db.Model):
     __tablename__ = 'emotion_playlists'
@@ -9,8 +9,8 @@ class EmotionPlaylist(db.Model):
     spotify_playlist_id = db.Column(db.String(100), nullable=False)
     playlist_name = db.Column(db.String(255), nullable=False)
     description = db.Column(db.Text, nullable=True)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
+    created_at = db.Column(db.DateTime, default=get_polish_time, nullable=False)
+    updated_at = db.Column(db.DateTime, default=get_polish_time, onupdate=get_polish_time, nullable=False)
 
     def to_dict(self):
         """Convert playlist to dictionary"""
