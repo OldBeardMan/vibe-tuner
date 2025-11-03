@@ -1,9 +1,9 @@
 from flask import Blueprint, request, jsonify
 from models.user import User
 from models.database import db
-from datetime import datetime, timedelta
+from datetime import timedelta
 import jwt
-from config.settings import Config
+from config.settings import Config, get_polish_time
 import re
 
 auth_bp = Blueprint('auth', __name__)
@@ -91,7 +91,7 @@ def login():
         # Generate JWT token (expires in 7 days)
         token = jwt.encode({
             'user_id': user.id,
-            'exp': datetime.utcnow() + timedelta(days=7)
+            'exp': get_polish_time() + timedelta(days=7)
         }, Config.SECRET_KEY, algorithm='HS256')
 
         return jsonify({
