@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:vibe_tuner/constants/app_strings.dart';
 
+import '../constants/app_colors.dart';
 import '../constants/app_sizes.dart';
 import '../models/emotion.dart';
 
@@ -12,18 +14,18 @@ class Song {
 }
 
 class HistoryCard extends StatefulWidget {
-  final int emotionCode;
+  final Emotion emotion;
   final DateTime dateTime;
-  final List<Song> songs;
-  final bool initiallyExpanded;
+  final double confidence;
+  final List<Song>? songs;
   final ValueChanged<bool>? onToggle;
 
   const HistoryCard({
     super.key,
-    required this.emotionCode,
+    required this.emotion,
     required this.dateTime,
-    required this.songs,
-    this.initiallyExpanded = false,
+    required this.confidence,
+    this.songs,
     this.onToggle,
   });
 
@@ -38,7 +40,6 @@ class _HistoryCardState extends State<HistoryCard>
   @override
   void initState() {
     super.initState();
-    _expanded = widget.initiallyExpanded;
   }
 
   void _toggleExpanded() {
@@ -53,6 +54,8 @@ class _HistoryCardState extends State<HistoryCard>
     return '${two(dt.day)}.${two(dt.month)}.${dt.year} ${two(dt.hour)}:${two(dt.minute)}';
   }
 
+  bool get _isManual => widget.confidence >= 0.999;
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -60,10 +63,10 @@ class _HistoryCardState extends State<HistoryCard>
     final borderColor = theme.colorScheme.onSurface;
     final textColor = theme.colorScheme.onSurface;
 
-    final em = Emotion.fromId(widget.emotionCode);
+    final em = widget.emotion;
     final iconLink = em.icon;
     final emotion = em.localName;
-
+    final conf = (widget.confidence).clamp(0.0, 1.0);
 
     return Padding(
       padding: const EdgeInsets.symmetric(
@@ -76,7 +79,7 @@ class _HistoryCardState extends State<HistoryCard>
           borderRadius: BorderRadius.circular(AppSizes.historyCardRadius),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.12),
+              color: Colors.black.withValues(alpha: AppSizes.historyPageDefaultOpacity),
               blurRadius: AppSizes.historyCardBlurRadius,
               offset: AppSizes.historyCardBlurOffset,
             ),
@@ -106,7 +109,7 @@ class _HistoryCardState extends State<HistoryCard>
                   ),
                 ),
 
-                const SizedBox(width: 12),
+                const SizedBox(width: AppSizes.pageNormalGap),
 
                 Expanded(
                   child: InkWell(
@@ -121,15 +124,12 @@ class _HistoryCardState extends State<HistoryCard>
                             emotion,
                             style: theme.textTheme.titleMedium?.copyWith(
                               fontWeight: FontWeight.w700,
-                              color: textColor,
                             ),
                           ),
                           const SizedBox(height: 4),
                           Text(
                             _formatDate(widget.dateTime),
-                            style: theme.textTheme.bodySmall?.copyWith(
-                              color: textColor.withValues(alpha: 0.8),
-                            ),
+                            style: theme.textTheme.bodySmall
                           ),
                         ],
                       ),
@@ -137,92 +137,82 @@ class _HistoryCardState extends State<HistoryCard>
                   ),
                 ),
 
-                AnimatedRotation(
-                  turns: _expanded ? 0.5 : 0.0,
-                  duration: AppSizes.historyCardAnimDuration,
-                  child: IconButton(
-                    icon: Icon(Icons.expand_more, color: borderColor),
-                    onPressed: _toggleExpanded,
-                    splashRadius: 20,
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(),
-                  ),
+                const SizedBox(width: AppSizes.pageNormalGap),
+
+                SizedBox(
+                  width: 110,
+                  child: _isManual ? _buildManualBadge(theme, textColor) : _buildConfidenceColumn(theme, conf, textColor),
                 ),
               ],
             ),
-
-            AnimatedSize(
-              duration: AppSizes.historyCardAnimDuration,
-              curve: Curves.easeInOut,
-              child: _expanded
-                  ? Padding(
-                padding: const EdgeInsets.only(top: AppSizes.historyCardSongSpacing),
-                child: _buildSongsList(context),
-              )
-                  : const SizedBox.shrink(),
-            ),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildSongsList(BuildContext context) {
-    final theme = Theme.of(context);
-    final dividerColor = theme.colorScheme.onSurface.withValues(alpha: 0.25);
-
-    final songs = widget.songs.length > 5 ? widget.songs.sublist(0, 5) : widget.songs;
-
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 6),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          for (var i = 0; i < songs.length; i++) ...[
-            _songRow(i + 1, songs[i], context),
-            if (i != songs.length - 1)
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8.0),
-                child: Divider(thickness: 0.8, height: 1, color: dividerColor),
-              ),
-          ],
-        ],
-      ),
-    );
-  }
-
-  Widget _songRow(int index, Song song, BuildContext context) {
-    final theme = Theme.of(context);
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
+  Widget _buildManualBadge(ThemeData theme, Color textColor) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.end,
       children: [
-        SizedBox(
-          width: 24,
-          child: Text(
-            '$index.',
-            style: theme.textTheme.bodySmall?.copyWith(fontWeight: FontWeight.w600),
-          ),
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Flexible(
+              child: Text(
+                AppStrings.historyCardManualEmotion,
+                textAlign: TextAlign.center,
+                style: theme.textTheme.bodySmall
+              ),
+            ),
+            const SizedBox(width: AppSizes.pageSmallGap),
+            const Icon(Icons.touch_app, size: AppSizes.historyCardTouchIconSize),
+          ],
         ),
+      ],
+    );
+  }
 
-        const SizedBox(width: 8),
+  Widget _buildConfidenceColumn(ThemeData theme, double conf, Color textColor) {
+    final percent = (conf * 100).round();
+    Color colorByConfidence;
+    if (conf <= 0.40) {
+      colorByConfidence = AppColors.confidenceLow;
+    } else if (conf <= 0.75) {
+      colorByConfidence = AppColors.confidenceMedium;
+    } else {
+      colorByConfidence = AppColors.confidenceHigh;
+    }
 
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                '“${song.title}”',
-                style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        Text(
+          '$percent%',
+          style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700, color: textColor),
+        ),
+        const SizedBox(height: 6),
+        TweenAnimationBuilder<double>(
+          tween: Tween(begin: 0.0, end: conf),
+          duration: const Duration(milliseconds: 600),
+          builder: (context, val, child) {
+            return ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: LinearProgressIndicator(
+                value: val,
+                minHeight: 8,
+                backgroundColor: theme.colorScheme.onSurface.withValues(alpha: 0.08),
+                valueColor: AlwaysStoppedAnimation(colorByConfidence),
               ),
-              const SizedBox(height: 4),
-              Text(
-                '- ${song.artist}',
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: theme.colorScheme.onSurface.withValues(alpha: 0.8),
-                ),
-              ),
-            ],
-          ),
+            );
+          },
+        ),
+        const SizedBox(height: 6),
+        Text(
+          AppStrings.historyCardClassificationConfidence,
+          style: theme.textTheme.bodySmall,
         ),
       ],
     );

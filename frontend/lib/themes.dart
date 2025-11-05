@@ -29,7 +29,7 @@ class AppThemes {
         surface: const Color(0xFFDCCFB8),
         primaryContainer: const Color(0xFFefe6d9),
         secondary: const Color(0xFF68625A),
-        error: const Color(0xFFBC8585)
+        error: const Color(0xFFBC8585),
     ),
   );
 
@@ -57,10 +57,10 @@ class AppThemes {
     ),
     colorScheme: ColorScheme.fromSeed(seedColor: Colors.brown, brightness: Brightness.dark)
         .copyWith(
-        surface: const Color(0xFF474747),
+        surface: const Color(0xFF424242),
         primaryContainer: const Color(0xFF3A3A3A),
         secondary: const Color(0xFF5E5E5E),
-        error: const Color(0xFF7C4545)
+        error: const Color(0xFF7C4545),
     ),
   );
 }

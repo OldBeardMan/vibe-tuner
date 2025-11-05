@@ -17,4 +17,8 @@ class AppColors {
     'neutral': Colors.green,
     '_other': Colors.grey.shade400,
   };
+
+  static const Color confidenceHigh = Colors.green;
+  static const Color confidenceMedium = Colors.amber;
+  static const Color confidenceLow = Colors.red;
 }

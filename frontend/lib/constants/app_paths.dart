@@ -20,6 +20,7 @@ class AppPaths {
   static const analyticsDistribution = '/analytics/distribution';
   static const analyticsByDay = '/analytics/by-day';
   static const analyticsByHour = '/analytics/by-hour';
+  static const history = '/emotion/history';
 
   // Icons
   static const emotionHappy = 'lib/assets/icons/sentiment_very_satisfied.svg';
