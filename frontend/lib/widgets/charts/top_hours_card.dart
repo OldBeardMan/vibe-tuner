@@ -150,7 +150,7 @@ class TopHoursCard extends StatelessWidget {
                             bottom: -2,
                             child: Text(
                               '${kv.value}',
-                              style: theme.textTheme.bodySmall?.copyWith(color: Colors.black, fontWeight: FontWeight.w700, fontSize: 11),
+                              style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurface, fontWeight: FontWeight.w700, fontSize: 11),
                             ),
                           ),
                         ],

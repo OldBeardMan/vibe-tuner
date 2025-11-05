@@ -94,6 +94,7 @@ class AppStrings {
   static const logOut2 = "Wyloguj się";
 
   // Errors
+  static const errorOccurred = 'Wystąpił błąd';
   static const errorDefault = 'Wystąpił błąd. Spróbuj ponownie.';
   static const errorManualRejected = 'Ręczny wybór emocji nie został przyjęty przez serwer. Spróbuj ponownie.';
   static const errorDetectionFailed = 'Nie wykryto twarzy ani emocji na zdjęciu. Zrób zdjęcie w lepszym świetle i upewnij się, że twarz jest widoczna.';
@@ -121,4 +122,13 @@ class AppStrings {
   static const analyticsCardEmotionTopTwo = '2';
   static const analyticsCardEmotionTopThree = '3';
   static final analyticsCardWeeklyLabels = ['Pn','Wt','Śr','Cz','Pt','So','Nd'];
+
+  // History Page
+  static const historyPageEmotionLabel = 'Emocja';
+  static const historyPageSourceLabel = 'Źródło';
+  static const historyPageManualFilterLabel = 'Ręczne';
+  static const historyPageFromFaceFilterLabel = 'Z twarzy';
+  static const historyPageEndOfResults = 'Koniec wyników';
+  static const historyCardManualEmotion = 'Emocja wybrana ręcznie';
+  static const historyCardClassificationConfidence = 'Pewność klasyfikacji';
 }

@@ -15,7 +15,6 @@ class Emotion {
     required this.iconPath,
   });
 
-  // central registry — use AppStrings for local names so you keep single source of truth
   static const List<Emotion> all = [
     Emotion(id: 1, localName: AppStrings.emotionHappy,    serverKey: 'happy',   iconPath: AppPaths.emotionHappy),
     Emotion(id: 2, localName: AppStrings.emotionSad,      serverKey: 'sad',     iconPath: AppPaths.emotionSad),
@@ -26,16 +25,13 @@ class Emotion {
     Emotion(id: 7, localName: AppStrings.emotionNeutral,  serverKey: 'neutral', iconPath: AppPaths.emotionNeutral),
   ];
 
-  // fallback/default emotion (pick neutral/calm or the first)
   static Emotion get defaultEmotion => all.firstWhere((e) => e.id == 5, orElse: () => all.first);
 
-  // lookup by id
   static Emotion fromId(int? id) {
     if (id == null) return defaultEmotion;
     return all.firstWhere((e) => e.id == id, orElse: () => defaultEmotion);
   }
 
-  // normalize helper (lowercase + remove Polish diacritics)
   static String _normalize(String s) {
     final lower = s.trim().toLowerCase();
     return lower
@@ -50,7 +46,6 @@ class Emotion {
         .replaceAll('ź', 'z');
   }
 
-  // lookup by localized (polish) name; returns null if not found
   static Emotion? tryFromLocalName(String? local) {
     if (local == null) return null;
     final key = _normalize(local);
@@ -61,12 +56,10 @@ class Emotion {
     }
   }
 
-  // safe: from local name or fallback
   static Emotion fromLocalNameOrDefault(String? local) {
     return tryFromLocalName(local) ?? defaultEmotion;
   }
 
-  // lookup by backend/server key (english)
   static Emotion? tryFromServerKey(String? key) {
     if (key == null) return null;
     final k = _normalize(key);
@@ -81,13 +74,11 @@ class Emotion {
     return tryFromServerKey(key) ?? defaultEmotion;
   }
 
-  // convenience getters
   String get name => localName;
   String get key => serverKey;
   String get icon => iconPath;
   int get code => id;
 
-  // json helpers (if needed)
   Map<String, dynamic> toMap() => {
     'id': id,
     'localName': localName,

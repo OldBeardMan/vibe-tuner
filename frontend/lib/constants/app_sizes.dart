@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/cupertino.dart';
 
 class AppSizes {
@@ -31,6 +29,10 @@ class AppSizes {
   static const Duration historyCardAnimDuration = Duration(milliseconds: 220);
   static const double historyCardBlurRadius = 6;
   static const Offset historyCardBlurOffset = Offset(0, 2);
+  static const double historyPageEmotionsSpace = 8.0;
+  static const double historyPageDefaultOpacity = 0.12;
+  static const double historyPageCheckIconSize = 16.0;
+  static const double historyCardTouchIconSize = 24.0;
 
   static const double dialogWidth = 320.0;
   static const double dialogPadding = 18.0;
