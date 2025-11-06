@@ -33,7 +33,6 @@ class CameraProvider extends ChangeNotifier {
   bool isSending = false;
   bool capturedIsFront = false;
 
-  // operation lock to avoid overlapping camera ops
   bool _isBusy = false;
   bool get isBusy => _isBusy;
 
@@ -172,7 +171,7 @@ class CameraProvider extends ChangeNotifier {
         isPreviewMode = true;
         notifyListeners();
       } catch (e) {
-        // ignore
+        debugPrint("CameraProvider.takePicture error: $e");
       }
     });
   }
@@ -188,7 +187,7 @@ class CameraProvider extends ChangeNotifier {
           notifyListeners();
         }
       } catch (e) {
-        // ignore
+        debugPrint("CameraProvider.pickFromGallery error: $e");
       }
     });
   }
@@ -206,7 +205,7 @@ class CameraProvider extends ChangeNotifier {
       final filename = p.basename(file.path);
       final initialMediaType = _guessImageMediaType(file.path);
 
-      Future<http.Response> _doSend(Uint8List bytes, String name, MediaType ct) async {
+      Future<http.Response> doSend(Uint8List bytes, String name, MediaType ct) async {
         final req = http.MultipartRequest('POST', uri);
         if (token?.isNotEmpty == true) req.headers['Authorization'] = 'Bearer $token';
         req.files.add(http.MultipartFile.fromBytes('image', bytes, filename: name, contentType: ct));
@@ -214,12 +213,10 @@ class CameraProvider extends ChangeNotifier {
         return await http.Response.fromStream(streamed);
       }
 
-      // 1) pierwsze wysłanie oryginalnego pliku
-      http.Response resp = await _doSend(originalBytes, filename, initialMediaType);
+      http.Response resp = await doSend(originalBytes, filename, initialMediaType);
 
-      // 2) jeśli serwer zwrócił 400 z treścią mówiącą o braku detekcji twarzy, spróbuj jednokrotnej normalizacji i resend
       if (resp.statusCode == 400) {
-        final bodyLower = resp.body.toLowerCase() ?? '';
+        final bodyLower = resp.body.toLowerCase();
         if (bodyLower.contains('could not detect') || bodyLower.contains('no face') || bodyLower.contains('could not detect face')) {
           try {
             final decoded = img.decodeImage(originalBytes);
@@ -233,15 +230,14 @@ class CameraProvider extends ChangeNotifier {
               }
               final jpgBytes = Uint8List.fromList(img.encodeJpg(proc, quality: 90));
               final jpgName = p.setExtension(filename, '.jpg');
-              resp = await _doSend(jpgBytes, jpgName, MediaType('image', 'jpeg'));
+              resp = await doSend(jpgBytes, jpgName, MediaType('image', 'jpeg'));
             }
           } catch (_) {
-            // jeśli normalizacja się nie powiedzie -> przejdziemy do zwrócenia failure
+            debugPrint("CameraProvider.sendCapturedImage error: could not decode image");
           }
         }
       }
 
-      // 3) obsługa odpowiedzi
       if (resp.statusCode >= 200 && resp.statusCode < 300) {
         if (resp.body.isEmpty) {
           return AnalyzeResult(
@@ -268,14 +264,12 @@ class CameraProvider extends ChangeNotifier {
         }
       }
 
-      // 4) non-2xx -> jeśli struktura zawiera użyteczne pola, zwróć ją, inaczej zwróć failure result
       try {
         final Map<String, dynamic> j = jsonDecode(resp.body) as Map<String, dynamic>;
         if (j.containsKey('emotion') || j.containsKey('playlist') || j.containsKey('songs') || j.containsKey('emotionCode')) {
           return AnalyzeResult.fromJson(j);
         }
       } catch (_) {}
-      // final failure result oznaczający, że detekcja się nie powiodła
       return AnalyzeResult(
         id: -1,
         emotion: AppStrings.unknown,

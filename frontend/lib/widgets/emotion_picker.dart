@@ -229,7 +229,7 @@ class _EmotionPickerState extends State<EmotionPicker> with SingleTickerProvider
                         backgroundColor:
                         Theme.of(context).colorScheme.primaryContainer,
                         foregroundColor:
-                        Theme.of(context).colorScheme.onPrimaryContainer,
+                        Theme.of(context).appBarTheme.foregroundColor,
                         padding: EdgeInsets.zero,
                         minimumSize: const Size(0, 32),
                         elevation: 2,
@@ -239,7 +239,7 @@ class _EmotionPickerState extends State<EmotionPicker> with SingleTickerProvider
                         ),
                       ),
                       onPressed: () {
-                        final serverKey = emotion.serverKey; // canonical key
+                        final serverKey = emotion.serverKey;
                         final future = _sendManualEmotionByServerKey(serverKey);
 
                         showGeneralDialog(

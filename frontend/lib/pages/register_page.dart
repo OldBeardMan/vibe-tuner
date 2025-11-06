@@ -87,10 +87,10 @@ class _RegisterPageState extends State<RegisterPage> {
     } on ApiException catch (e) {
       final info = mapApiExceptionToBannerInfo(e);
       _showBannerWithInfo(info);
-    } on SocketException catch (e) {
+    } on SocketException {
       final info = BannerInfo(AppStrings.serverConnectionError, AppColors.signInError);
       _showBannerWithInfo(info);
-    } on TimeoutException catch (e) {
+    } on TimeoutException {
       final info = BannerInfo(AppStrings.serverNotRespondingError, AppColors.signInError);
       _showBannerWithInfo(info);
     } catch (e) {

@@ -10,6 +10,7 @@ class AppSizes {
   static const double pageSmallGap = 8.0;
   static const double pageNormalGap = 12.0;
   static const double pageLargeGap = 32.0;
+  static const double defaultOpacity = 0.12;
 
   static const double expandableCardRadius = 14.0;
   static const double expandableCardPadding = 14.0;
@@ -19,6 +20,22 @@ class AppSizes {
   static const double expandableCardBasicTitleSize = 16.0;
   static const double expandableCardBlurRadius = 3;
   static const Offset expandableCardBlurOffset = Offset(0, 1);
+
+  static const double userPageGroupGap = 20.0;
+  static const double userPageFontSize = 16.0;
+  static const double userPagePadding = 16.0;
+
+  static const double infoPageHeaderFontSize = 18.0;
+  static const double infoPageBodyFontSize = 15.0;
+  static const double infoPageSectionTitleFontSize = 17.0;
+  static const double infoPageBulletFontSize = 18.0;
+  static const double infoPageBulletGap = 6.0;
+  static const double infoPageSectionGap = 14.0;
+  static const double infoPageSmallGap = 6.0;
+  static const double infoPageButtonPaddingHorizontal = 24.0;
+  static const double infoPageButtonPaddingVertical = 12.0;
+  static const double infoPageButtonIconSize = 20.0;
+  static const double infoPageCardPadding = 12.0;
 
   static const double historyCardPadding = 14.0;
   static const double historyCardRadius = 14.0;
@@ -30,7 +47,6 @@ class AppSizes {
   static const double historyCardBlurRadius = 6;
   static const Offset historyCardBlurOffset = Offset(0, 2);
   static const double historyPageEmotionsSpace = 8.0;
-  static const double historyPageDefaultOpacity = 0.12;
   static const double historyPageCheckIconSize = 16.0;
   static const double historyCardTouchIconSize = 24.0;
 

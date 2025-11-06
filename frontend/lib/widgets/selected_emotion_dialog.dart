@@ -427,7 +427,7 @@ class _SelectedEmotionDialogState extends State<SelectedEmotionDialog> {
       mainAxisSize: MainAxisSize.min,
       children: [
         const SizedBox(height: AppSizes.dialogTitleTopSpacing),
-        Text('Uwaga', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
+        Text(AppStrings.dialogAttention, style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
         const SizedBox(height: AppSizes.dialogBetweenTitleAndIcon),
         Icon(Icons.warning_amber_rounded, size: AppSizes.dialogSpinningIconSize, color: Theme.of(context).colorScheme.error),
         const SizedBox(height: AppSizes.dialogBetweenIconAndName),
@@ -450,7 +450,7 @@ class _SelectedEmotionDialogState extends State<SelectedEmotionDialog> {
                   side: BorderSide(color: Theme.of(context).colorScheme.onSurface),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppSizes.buttonBorderRadius)),
                 ),
-                child: Text('Anuluj', style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
+                child: Text(AppStrings.dialogCancel, style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
               ),
             ),
           ],

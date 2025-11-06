@@ -178,7 +178,7 @@ class _HourlyStackedLineChartState extends State<HourlyStackedLineChart> {
                 LineChartData(
                   gridData: FlGridData(
                     show: true,
-                    drawVerticalLine: false,
+                    drawVerticalLine: true,
                     horizontalInterval: (_maxTotal / 4).ceilToDouble(),
                   ),
                   titlesData: FlTitlesData(

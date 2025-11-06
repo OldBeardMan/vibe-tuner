@@ -61,7 +61,7 @@ final GoRouter router = GoRouter(
           path: AppPaths.recommendedSongsPage,
           builder: (context, state) {
             final args = state.extra as RecommendedSongsArgs?;
-            if (args == null) return const Scaffold(body: Center(child: Text('Brak danych rekomendacji')));
+            if (args == null) return const Scaffold(body: Center(child: Text(AppStrings.recommendedSongsNoData)));
             return RecommendedSongsPage(args: args);
           },
         ),

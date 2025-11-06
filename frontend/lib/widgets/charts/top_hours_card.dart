@@ -144,7 +144,6 @@ class TopHoursCard extends StatelessWidget {
                         clipBehavior: Clip.none,
                         children: [
                           _buildIconOrFallback(em, color, theme),
-                          // badge bottom-right
                           Positioned(
                             right: -2,
                             bottom: -2,
@@ -212,7 +211,6 @@ class TopHoursCard extends StatelessWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            // icons row (scrollable if needed)
                             SingleChildScrollView(
                               scrollDirection: Axis.horizontal,
                               child: Row(children: icons),
@@ -235,7 +233,6 @@ class TopHoursCard extends StatelessWidget {
 
                       const SizedBox(width: AppSizes.pageSmallGap),
 
-                      // total count on the right
                       Text('$hourTotal', style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w700)),
                     ],
                   ),

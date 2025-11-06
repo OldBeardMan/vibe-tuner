@@ -103,7 +103,6 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  // left: gallery
                   IconButton(
                     onPressed: (p.isBusy || p.isInitializing) ? null : p.pickFromGallery,
                     icon: const Icon(Icons.photo_library_outlined),
@@ -123,7 +122,6 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
                     ),
                   ),
 
-                  // switch
                   IconButton(
                     onPressed: (p.isBusy || p.isInitializing) ? null : p.switchCamera,
                     icon: const Icon(Icons.cameraswitch),
@@ -153,7 +151,7 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
     if (p.capturedIsFront) {
       imageWidget = Transform(
         alignment: Alignment.center,
-        transform: Matrix4.identity()..scale(-1.0, 1.0, 1.0),
+        transform: Matrix4.diagonal3Values(-1.0, 1.0, 1.0),
         child: imageWidget,
       );
     }
@@ -197,10 +195,8 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
                             final Future<dynamic> sendFuture = p.sendCapturedImage(token: context.read<AuthProvider>().token);
                             p.reset();
 
-                            // wróć do ekranu głównego zanim dialog się pokaże (jak miałeś)
                             context.go(AppPaths.homePage);
 
-                            // pokaż dialog który będzie czekał na sendFuture
                             SchedulerBinding.instance.addPostFrameCallback((_) {
                               showGeneralDialog(
                                 context: context,
@@ -213,8 +209,7 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
                               );
                             });
                           } catch (e) {
-                            // opcjonalnie: loguj
-                            // debugPrint('send error: $e');
+                            debugPrint('send error: $e');
                           }
                         },
                         child: Container(

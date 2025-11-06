@@ -56,7 +56,6 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
-  /// Register user via API. Throws ApiException on error.
   Future<void> register({required String email, required String password}) async {
     await _setLoading(true);
     try {
@@ -69,7 +68,6 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
-  /// Login and store token. Throws ApiException on error.
   Future<void> login({required String email, required String password}) async {
     await _setLoading(true);
     try {
@@ -93,7 +91,6 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
-  /// Logout: clear local token and storage
   Future<void> logout() async {
     _isLoggedIn = false;
     _token = null;

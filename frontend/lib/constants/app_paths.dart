@@ -30,4 +30,7 @@ class AppPaths {
   static const emotionFear = 'lib/assets/icons/sentiment_fear.svg';
   static const emotionDisgust = 'lib/assets/icons/sentiment_disgust.svg';
   static const emotionNeutral = 'lib/assets/icons/sentiment_calm.svg';
+
+  // Links
+  static const githubUrl = 'https://github.com/OldBeardMan/vibe-tuner';
 }

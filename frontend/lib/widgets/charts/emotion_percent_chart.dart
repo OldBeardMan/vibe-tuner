@@ -61,7 +61,6 @@ class _EmotionPercentChartState extends State<EmotionPercentChart> {
             : Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // header row
             Row(
               children: [
                 Text(widget.title,

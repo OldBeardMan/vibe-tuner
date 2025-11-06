@@ -2,10 +2,8 @@ import 'package:vibe_tuner/constants/app_paths.dart';
 import 'package:vibe_tuner/constants/app_strings.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import '../constants/app_sizes.dart';
-import '../providers/emotion_provider.dart';
 import '../widgets/emotion_picker.dart';
 
 class HomePage extends StatefulWidget {
@@ -18,7 +16,6 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
 
   @override
   Widget build(BuildContext context) {
-    final emoProv = Provider.of<EmotionProvider>(context);
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -41,7 +38,6 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // Ikona aparatu
               Container(
                 width: 160,
                 height: 120,
@@ -75,13 +71,6 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
               const Text(AppStrings.homePageOr),
               const SizedBox(height: 12),
               const EmotionPicker(),
-              const SizedBox(height: 16),
-
-              if (emoProv.selectedEmotion != null)
-                Text(
-                  'Wybrana emocja: ${emoProv.selectedEmotion}',
-                  style: const TextStyle(fontWeight: FontWeight.bold),
-                ),
             ],
           ),
         ),

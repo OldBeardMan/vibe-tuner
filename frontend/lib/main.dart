@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:vibe_tuner/constants/app_strings.dart';
 import 'package:vibe_tuner/providers/camera_provider.dart';
 import 'package:vibe_tuner/providers/theme_provider.dart';
 import 'router.dart';
 import 'providers/auth_provider.dart';
-import 'providers/emotion_provider.dart';
 import 'themes.dart';
 
 void main() {
@@ -13,7 +13,6 @@ void main() {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => AuthProvider()),
-        ChangeNotifierProvider(create: (_) => EmotionProvider()),
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
         ChangeNotifierProvider(create: (_) => CameraProvider()),
       ],
@@ -30,7 +29,7 @@ class MyApp extends StatelessWidget {
 
     return MaterialApp.router(
       debugShowCheckedModeBanner: false,
-      title: 'vibe_tuner',
+      title: AppStrings.appTitle,
       theme: AppThemes.lightTheme,
       darkTheme: AppThemes.darkTheme,
       themeMode: themeProv.themeMode,

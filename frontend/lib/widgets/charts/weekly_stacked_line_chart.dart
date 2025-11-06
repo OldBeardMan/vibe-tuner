@@ -223,7 +223,7 @@ class _WeeklyStackedLineChartState extends State<WeeklyStackedLineChart> {
 
             const SizedBox(height: AppSizes.pageSmallGap),
 
-            // chips legend (show Polish names)
+            // legend
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               padding: const EdgeInsets.symmetric(horizontal: AppSizes.pageSmallGap),
