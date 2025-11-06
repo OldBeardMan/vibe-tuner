@@ -38,7 +38,6 @@ class TotalEmotionsCountCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // header
             Row(
               children: [
                 Expanded(
@@ -53,7 +52,6 @@ class TotalEmotionsCountCard extends StatelessWidget {
 
             const SizedBox(height: AppSizes.pageNormalGap),
 
-            // big total
             Row(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [

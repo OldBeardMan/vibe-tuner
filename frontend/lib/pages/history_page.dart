@@ -246,13 +246,13 @@ class _HistoryPageState extends State<HistoryPage> {
                               padding: const EdgeInsets.symmetric(horizontal: AppSizes.pageNormalGap),
                               decoration: BoxDecoration(
                                 color: selected
-                                    ? theme.colorScheme.onSurface.withValues(alpha: AppSizes.historyPageDefaultOpacity)
+                                    ? theme.colorScheme.onSurface.withValues(alpha: AppSizes.defaultOpacity)
                                     : theme.scaffoldBackgroundColor,
                                 borderRadius: BorderRadius.circular(AppSizes.pageFieldCornerRadius),
                                 border: Border.all(
                                   color: selected
                                       ? theme.colorScheme.onSurface
-                                      : theme.colorScheme.onSurface.withValues(alpha: AppSizes.historyPageDefaultOpacity),
+                                      : theme.colorScheme.onSurface.withValues(alpha: AppSizes.defaultOpacity),
                                   width: selected ? 1.6 : 1.0,
                                 ),
                               ),
@@ -304,9 +304,9 @@ class _HistoryPageState extends State<HistoryPage> {
                           padding: const EdgeInsets.symmetric(vertical: 10),
                           margin: const EdgeInsets.only(right: AppSizes.historyPageEmotionsSpace),
                           decoration: BoxDecoration(
-                            color: _selectedSources.contains('manual') ? theme.colorScheme.onSurface.withValues(alpha: AppSizes.historyPageDefaultOpacity) : Colors.transparent,
+                            color: _selectedSources.contains('manual') ? theme.colorScheme.onSurface.withValues(alpha: AppSizes.defaultOpacity) : Colors.transparent,
                             border: Border.all(
-                              color: _selectedSources.contains('manual') ? theme.colorScheme.onSurface : theme.colorScheme.onSurface.withValues(alpha: AppSizes.historyPageDefaultOpacity),
+                              color: _selectedSources.contains('manual') ? theme.colorScheme.onSurface : theme.colorScheme.onSurface.withValues(alpha: AppSizes.defaultOpacity),
                               width: _selectedSources.contains('manual') ? 1.6 : 1.0,
                             ),
                             borderRadius: BorderRadius.circular(AppSizes.pageFieldCornerRadius),
@@ -346,9 +346,9 @@ class _HistoryPageState extends State<HistoryPage> {
                           padding: const EdgeInsets.symmetric(vertical: 10),
                           margin: const EdgeInsets.only(left: AppSizes.pageSmallGap),
                           decoration: BoxDecoration(
-                            color: _selectedSources.contains('face') ? theme.colorScheme.onSurface.withValues(alpha: AppSizes.historyPageDefaultOpacity) : Colors.transparent,
+                            color: _selectedSources.contains('face') ? theme.colorScheme.onSurface.withValues(alpha: AppSizes.defaultOpacity) : Colors.transparent,
                             border: Border.all(
-                              color: _selectedSources.contains('face') ? theme.colorScheme.onSurface : theme.colorScheme.onSurface.withValues(alpha: AppSizes.historyPageDefaultOpacity),
+                              color: _selectedSources.contains('face') ? theme.colorScheme.onSurface : theme.colorScheme.onSurface.withValues(alpha: AppSizes.defaultOpacity),
                               width: _selectedSources.contains('face') ? 1.6 : 1.0,
                             ),
                             borderRadius: BorderRadius.circular(AppSizes.pageFieldCornerRadius),
@@ -386,18 +386,18 @@ class _HistoryPageState extends State<HistoryPage> {
               onRefresh: _onRefresh,
               child: ListView.builder(
                 controller: _scrollController,
-                padding: const EdgeInsets.symmetric(vertical: 8),
+                padding: const EdgeInsets.symmetric(vertical: AppSizes.pageSmallGap),
                 itemCount: _displayedRecords.length + 1,
                 itemBuilder: (context, index) {
                   if (index >= _displayedRecords.length) {
                     if (_loadingMore) {
                       return const Padding(
-                        padding: EdgeInsets.symmetric(vertical: 12),
+                        padding: EdgeInsets.symmetric(vertical: AppSizes.pageNormalGap),
                         child: Center(child: CircularProgressIndicator()),
                       );
                     } else if (!_hasMore) {
                       return const Padding(
-                        padding: EdgeInsets.symmetric(vertical: 12),
+                        padding: EdgeInsets.symmetric(vertical: AppSizes.pageNormalGap),
                         child: Center(child: Text(AppStrings.historyPageEndOfResults)),
                       );
                     } else {
@@ -430,7 +430,7 @@ class _HistoryPageState extends State<HistoryPage> {
         mainAxisSize: MainAxisSize.min,
         children: [
           Text('${AppStrings.errorOccurred}:', style: Theme.of(context).textTheme.titleMedium),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppSizes.pageSmallGap),
           Text(_error ?? AppStrings.errorDefault, textAlign: TextAlign.center),
         ],
       ),

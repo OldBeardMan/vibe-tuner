@@ -79,7 +79,7 @@ class _HistoryCardState extends State<HistoryCard>
           borderRadius: BorderRadius.circular(AppSizes.historyCardRadius),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: AppSizes.historyPageDefaultOpacity),
+              color: Colors.black.withValues(alpha: AppSizes.defaultOpacity),
               blurRadius: AppSizes.historyCardBlurRadius,
               offset: AppSizes.historyCardBlurOffset,
             ),

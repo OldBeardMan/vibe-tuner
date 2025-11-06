@@ -71,11 +71,10 @@ class LogoutCard extends StatelessWidget {
       padding: const EdgeInsets.only(
         left: AppSizes.expandableCardPadding,
         right: AppSizes.expandableCardPadding,
-        top: AppSizes.expandableCardPaddingBetween,
       ),
       child: Container(
         decoration: BoxDecoration(
-          color: theme.colorScheme.surface,
+          color: theme.colorScheme.primaryContainer,
           borderRadius: BorderRadius.circular(AppSizes.expandableCardRadius),
           boxShadow: [
             BoxShadow(
@@ -95,11 +94,7 @@ class LogoutCard extends StatelessWidget {
                 child: Padding(
                   padding: const EdgeInsets.symmetric(vertical: 6),
                   child: Text(AppStrings.logOut2,
-                    style: theme.textTheme.bodySmall?.copyWith(
-                        fontSize: AppSizes.expandableCardBasicTitleSize,
-                        fontWeight: FontWeight.bold,
-                        color: theme.colorScheme.onSurface
-                    ),
+                    style: GoogleFonts.inter(fontSize: 16)
                   ),
                 ),
               ),

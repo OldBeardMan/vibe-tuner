@@ -27,6 +27,7 @@ dependencies:
   http_parser: ^4.0.0
   path: ^1.8.2
   fl_chart: ^1.1.1
+  url_launcher: ^6.3.0
 
 dev_dependencies:
   flutter_test:
@@ -39,4 +40,3 @@ flutter:
 
   assets:
     - lib/assets/icons/
-    - lib/assets/mock/response/recommended_emotion/
