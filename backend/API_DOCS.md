@@ -60,6 +60,84 @@ POST /api/auth/login
 
 **Token wygasa po 7 dniach.**
 
+### Aktualizacja konta
+```
+PUT /api/auth/account
+```
+
+**Headers:**
+```
+Authorization: Bearer <token>
+Content-Type: application/json
+```
+
+**Body:**
+```json
+{
+  "current_password": "password123",
+  "email": "newemail@example.com",
+  "password": "newpassword123"
+}
+```
+
+**Pola:**
+- `current_password` (wymagane): obecne hasło do weryfikacji tożsamości
+- `email` (opcjonalne): nowy email
+- `password` (opcjonalne): nowe hasło
+
+**Uwaga:** Należy podać przynajmniej jedno pole do aktualizacji (`email` lub `password`).
+
+**Response (200):**
+```json
+{
+  "message": "Account updated successfully",
+  "user": {
+    "id": 1,
+    "email": "newemail@example.com",
+    "created_at": "2025-01-15T10:00:00"
+  }
+}
+```
+
+**Możliwe błędy:**
+- `400` - Brak danych lub nie podano pola do aktualizacji
+- `401` - Nieprawidłowe obecne hasło lub brak tokenu
+- `409` - Email jest już używany przez inne konto
+
+### Usunięcie konta
+```
+DELETE /api/auth/account
+```
+
+**Headers:**
+```
+Authorization: Bearer <token>
+Content-Type: application/json
+```
+
+**Body:**
+```json
+{
+  "password": "password123"
+}
+```
+
+**Pola:**
+- `password` (wymagane): hasło do potwierdzenia usunięcia konta
+
+**Response (200):**
+```json
+{
+  "message": "Account matt@krupa.net has been permanently deleted"
+}
+```
+
+**Uwaga:** Usunięcie konta jest permanentne i usuwa wszystkie powiązane dane (rekordy emocji) dzięki cascade delete.
+
+**Możliwe błędy:**
+- `400` - Brak hasła
+- `401` - Nieprawidłowe hasło lub brak tokenu
+
 ---
 
 ## Detekcja emocji
