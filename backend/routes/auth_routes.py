@@ -103,66 +103,6 @@ def login():
     except Exception as e:
         return jsonify({'error': f'Login failed: {str(e)}'}), 500
 
-@auth_bp.route('/auth/account', methods=['PUT'])
-@token_required
-def update_account():
-    """
-    Update user account (email and/or password)
-    Expected JSON: { "email": "newemail@example.com", "password": "newpassword", "current_password": "currentpassword" }
-    Note: current_password is required to verify identity before making changes
-    """
-    try:
-        data = request.get_json()
-
-        if not data:
-            return jsonify({'error': 'No data provided'}), 400
-
-        current_password = data.get('current_password')
-        new_email = data.get('email')
-        new_password = data.get('password')
-
-        # Require current password for security
-        if not current_password:
-            return jsonify({'error': 'Current password is required to update account'}), 400
-
-        # Verify current password
-        if not request.current_user.check_password(current_password):
-            return jsonify({'error': 'Current password is incorrect'}), 401
-
-        # Check if at least one field to update is provided
-        if not new_email and not new_password:
-            return jsonify({'error': 'Provide at least email or password to update'}), 400
-
-        # Update email if provided
-        if new_email:
-            if not validate_email(new_email):
-                return jsonify({'error': 'Invalid email format'}), 400
-
-            # Check if email is already taken by another user
-            existing_user = User.query.filter_by(email=new_email.lower()).first()
-            if existing_user and existing_user.id != request.current_user.id:
-                return jsonify({'error': 'Email is already in use by another account'}), 409
-
-            request.current_user.email = new_email.lower()
-
-        # Update password if provided
-        if new_password:
-            if not validate_password(new_password):
-                return jsonify({'error': 'Password must be at least 6 characters long'}), 400
-
-            request.current_user.set_password(new_password)
-
-        db.session.commit()
-
-        return jsonify({
-            'message': 'Account updated successfully',
-            'user': request.current_user.to_dict()
-        }), 200
-
-    except Exception as e:
-        db.session.rollback()
-        return jsonify({'error': f'Account update failed: {str(e)}'}), 500
-
 @auth_bp.route('/auth/account', methods=['DELETE'])
 @token_required
 def delete_account():
