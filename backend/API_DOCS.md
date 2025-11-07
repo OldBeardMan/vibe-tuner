@@ -60,6 +60,40 @@ POST /api/auth/login
 
 **Token wygasa po 7 dniach.**
 
+### Usunięcie konta
+```
+DELETE /api/auth/account
+```
+
+**Headers:**
+```
+Authorization: Bearer <token>
+Content-Type: application/json
+```
+
+**Body:**
+```json
+{
+  "password": "password123"
+}
+```
+
+**Pola:**
+- `password` (wymagane): hasło do potwierdzenia usunięcia konta
+
+**Response (200):**
+```json
+{
+  "message": "Account matt@krupa.net has been permanently deleted"
+}
+```
+
+**Uwaga:** Usunięcie konta jest permanentne i usuwa wszystkie powiązane dane (rekordy emocji) dzięki cascade delete.
+
+**Możliwe błędy:**
+- `400` - Brak hasła
+- `401` - Nieprawidłowe hasło lub brak tokenu
+
 ---
 
 ## Detekcja emocji

@@ -4,6 +4,7 @@ from models.database import db
 from datetime import timedelta
 import jwt
 from config.settings import Config, get_polish_time
+from middleware.auth import token_required
 import re
 
 auth_bp = Blueprint('auth', __name__)
@@ -101,3 +102,42 @@ def login():
 
     except Exception as e:
         return jsonify({'error': f'Login failed: {str(e)}'}), 500
+
+@auth_bp.route('/auth/account', methods=['DELETE'])
+@token_required
+def delete_account():
+    """
+    Delete user account permanently
+    Expected JSON: { "password": "userpassword" }
+    Note: Requires password confirmation for security. This will delete all associated data.
+    """
+    try:
+        data = request.get_json()
+
+        if not data:
+            return jsonify({'error': 'No data provided'}), 400
+
+        password = data.get('password')
+
+        # Require password for security
+        if not password:
+            return jsonify({'error': 'Password is required to delete account'}), 400
+
+        # Verify password
+        if not request.current_user.check_password(password):
+            return jsonify({'error': 'Password is incorrect'}), 401
+
+        # Store user email for response before deletion
+        user_email = request.current_user.email
+
+        # Delete user (cascade will delete all emotion_records automatically)
+        db.session.delete(request.current_user)
+        db.session.commit()
+
+        return jsonify({
+            'message': f'Account {user_email} has been permanently deleted'
+        }), 200
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': f'Account deletion failed: {str(e)}'}), 500
