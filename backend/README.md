@@ -86,7 +86,6 @@ Pełna dokumentacja API znajduje się w pliku [`API_DOCS.md`](./API_DOCS.md)
 #### Historia
 - `GET /api/emotion/history` - Historia zapisanych emocji
 - `GET /api/emotion/:id` - Pojedynczy rekord
-- `DELETE /api/emotion/:id` - Usunięcie rekordu
 
 #### Analityka
 - `GET /api/analytics/by-hour` - Statystyki według godzin

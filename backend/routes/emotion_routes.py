@@ -157,48 +157,6 @@ def get_emotion(emotion_id):
         return jsonify({'error': f'Failed to fetch record: {str(e)}'}), 500
 
 
-@emotion_bp.route('/emotion/<int:emotion_id>', methods=['DELETE'])
-@token_required
-def delete_emotion(emotion_id):
-    """
-    Delete an emotion record
-    """
-    try:
-        emotion_record = EmotionRecord.query.filter_by(
-            id=emotion_id,
-            user_id=request.current_user.id
-        ).first()
-
-        if not emotion_record:
-            return jsonify({'error': 'Emotion record not found'}), 404
-
-        db.session.delete(emotion_record)
-        db.session.commit()
-
-        return jsonify({'message': 'Emotion record deleted successfully'}), 200
-
-    except Exception as e:
-        db.session.rollback()
-        return jsonify({'error': f'Failed to delete record: {str(e)}'}), 500
-
-
-@emotion_bp.route('/emotions/types', methods=['GET'])
-def get_emotion_types():
-    """
-    Get all available emotion types from database
-    Public endpoint - no authentication required
-    """
-    try:
-        emotion_types = EmotionType.get_all()
-        return jsonify({
-            'emotion_types': [et.to_dict() for et in emotion_types],
-            'total': len(emotion_types)
-        }), 200
-
-    except Exception as e:
-        return jsonify({'error': f'Failed to fetch emotion types: {str(e)}'}), 500
-
-
 @emotion_bp.route('/emotion/<int:emotion_id>/feedback', methods=['POST'])
 @token_required
 def set_emotion_feedback(emotion_id):

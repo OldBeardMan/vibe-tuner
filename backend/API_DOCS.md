@@ -245,23 +245,6 @@ Authorization: Bearer <token>
 }
 ```
 
-### Usunięcie rekordu
-```
-DELETE /api/emotion/:id
-```
-
-**Headers:**
-```
-Authorization: Bearer <token>
-```
-
-**Response (200):**
-```json
-{
-  "message": "Emotion record deleted successfully"
-}
-```
-
 ### Ustawienie feedbacku użytkownika dla wykrytej emocji
 ```
 POST /api/emotion/:id/feedback
@@ -305,36 +288,6 @@ Content-Type: application/json
 - `null` - brak feedbacku od użytkownika
 - `true` - użytkownik zgadza się z wykrytą emocją
 - `false` - użytkownik nie zgadza się z wykrytą emocją
-
-### Pobranie dostępnych typów emocji
-```
-GET /api/emotions/types
-```
-
-**Response (200):**
-```json
-{
-  "emotion_types": [
-    {
-      "id": 1,
-      "name": "happy",
-      "display_name": "Happy",
-      "description": "Feeling joyful, cheerful, and content",
-      "created_at": "2025-01-15T10:00:00"
-    },
-    {
-      "id": 2,
-      "name": "sad",
-      "display_name": "Sad",
-      "description": "Feeling down, melancholic, or blue",
-      "created_at": "2025-01-15T10:00:00"
-    }
-  ],
-  "total": 6
-}
-```
-
-**Uwaga:** Ten endpoint jest publiczny (nie wymaga autoryzacji) i zwraca wszystkie dostępne typy emocji zdefiniowane w bazie danych.
 
 ---
 
