@@ -16,31 +16,39 @@ class SpotifyService:
         """Get playlist ID from database for given emotion"""
         playlist = EmotionPlaylist.get_by_emotion(emotion)
         return playlist.spotify_playlist_id if playlist else None
-    
-    def get_playlist_for_emotion(self, emotion):
+
+    def get_random_tracks_for_emotion(self, emotion, count=5):
         """
-        Get pre-created Spotify playlist for given emotion
-        Fetches playlist details from Spotify API
+        Get random tracks from Spotify playlist for given emotion
+        Returns a list of randomly selected tracks
+
+        Args:
+            emotion: emotion name (e.g. 'happy', 'sad')
+            count: number of random tracks to return (default: 5)
+
+        Returns:
+            List of track dictionaries with keys: name, artist, spotify_id,
+            preview_url, external_url, album_image
         """
         try:
             if not self.spotify:
-                return None
+                return []
 
             # Get playlist ID from database
             playlist_id = self._get_playlist_id_for_emotion(emotion)
 
             if not playlist_id:
-                return None
+                return []
 
             # Fetch playlist details from Spotify
             playlist = self.spotify.playlist(playlist_id)
 
-            # Get tracks from playlist
-            tracks = []
-            for item in playlist['tracks']['items'][:20]:  # Limit to 20 tracks
+            # Get all tracks from playlist
+            all_tracks = []
+            for item in playlist['tracks']['items']:
                 if item['track']:
                     track = item['track']
-                    tracks.append({
+                    all_tracks.append({
                         'name': track['name'],
                         'artist': track['artists'][0]['name'] if track['artists'] else 'Unknown',
                         'spotify_id': track['id'],
@@ -49,33 +57,12 @@ class SpotifyService:
                         'album_image': track['album']['images'][0]['url'] if track['album']['images'] else None
                     })
 
-            return {
-                'id': playlist_id,
-                'name': playlist['name'],
-                'description': playlist.get('description', ''),
-                'emotion': emotion,
-                'tracks': tracks,
-                'total_tracks': len(tracks),
-                'external_url': playlist['external_urls']['spotify'],
-                'image': playlist['images'][0]['url'] if playlist['images'] else None
-            }
+            # Return random sample of tracks
+            if len(all_tracks) <= count:
+                return all_tracks
+
+            return random.sample(all_tracks, count)
 
         except Exception as e:
-            print(f"Error getting Spotify playlist: {str(e)}")
-            return self._get_fallback_playlist(emotion)
-    
-    def _get_fallback_playlist(self, emotion):
-        """Fallback playlist when Spotify API fails"""
-        playlist_id = self._get_playlist_id_for_emotion(emotion) or ''
-
-        return {
-            'id': playlist_id,
-            'name': f'{emotion.title()} Vibes',
-            'description': f'A playlist for {emotion} mood',
-            'emotion': emotion,
-            'tracks': [],
-            'total_tracks': 0,
-            'external_url': f'https://open.spotify.com/playlist/{playlist_id}',
-            'image': None,
-            'error': 'Could not fetch playlist from Spotify'
-        }
+            print(f"Error getting Spotify tracks: {str(e)}")
+            return []

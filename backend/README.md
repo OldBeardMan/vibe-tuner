@@ -54,19 +54,24 @@ python app.py
 
 ## Konfiguracja bazy danych
 
-Baza danych posiada dymyślnie dane. Aby uruchomić bazę danych należy wykonać
+Baza danych posiada domyślnie dane. Aby uruchomić bazę danych należy wykonać:
 ```bash
 docker compose up -d
 ```
 
-dane i tabelki zapiszą się podczas pierwszego uruchomienia bazy. Jeżeli jest potrzeba uruchomienia bazy od nowa należy wykonać
+Tabele i dane inicjalizacyjne (typy emocji, playlisty) zostaną utworzone podczas pierwszego uruchomienia aplikacji.
+
+### Reset bazy danych
+
+Jeżeli jest potrzeba uruchomienia bazy od nowa (np. po zmianach w schemacie):
 ```bash
 docker compose down -v
 docker compose up -d
+python reset_db.py  # Inicjalizuje schemat i dane podstawowe
 ```
 
-Po włączeniu bazy danych dostępna jest aplikacja dbAdmin do zarządzania bazą danych pod adresem localhost:8080. 
-Dane do logowania oraz więcej szczegółowych danych w pliku docker-compose.yml
+Po włączeniu bazy danych dostępna jest aplikacja pgAdmin do zarządzania bazą danych pod adresem `localhost:8080`.
+Dane do logowania oraz więcej szczegółowych danych w pliku `docker-compose.yml`.
 
 Backend będzie dostępny pod adresem: `http://localhost:5000`
 
@@ -81,7 +86,8 @@ Pełna dokumentacja API znajduje się w pliku [`API_DOCS.md`](./API_DOCS.md)
 - `POST /api/auth/login` - Logowanie (zwraca JWT token)
 
 #### Detekcja emocji
-- `POST /api/emotion/analyze` - Analiza emocji ze zdjęcia (wymaga tokenu)
+- `POST /api/emotion/analyze` - Analiza emocji ze zdjęcia lub ręczne wprowadzenie (wymaga tokenu)
+  - Zwraca **5 losowych piosenek** z playlisty przypisanej do emocji
 
 #### Historia
 - `GET /api/emotion/history` - Historia zapisanych emocji
@@ -99,6 +105,9 @@ backend/
 ├── models/                 # Modele bazy danych
 │   ├── user.py            # Model użytkownika
 │   ├── emotion.py         # Model rekordu emocji
+│   ├── emotion_track.py   # Model piosenki przypisanej do emocji
+│   ├── emotion_type.py    # Model typu emocji
+│   ├── playlist.py        # Model playlisty Spotify
 │   └── database.py        # Konfiguracja SQLAlchemy
 ├── routes/                # Endpointy API
 │   ├── auth_routes.py     # Autentykacja
@@ -106,7 +115,7 @@ backend/
 │   └── analytics_routes.py # Statystyki
 ├── services/              # Logika biznesowa
 │   ├── emotion_detector.py # DeepFace integration
-│   ├── spotify_service.py  # Spotify API integration
+│   ├── spotify_service.py  # Spotify API (losowanie piosenek)
 │   └── analytics_service.py # Analityka danych
 ├── middleware/            # Middleware (JWT auth)
 │   └── auth.py
@@ -115,6 +124,7 @@ backend/
 ├── app.py                 # Główny plik aplikacji
 ├── requirements.txt       # Zależności Python
 ├── .env.example          # Przykładowa konfiguracja
+├── docker-compose.yml    # Konfiguracja Docker dla PostgreSQL
 └── API_DOCS.md           # Pełna dokumentacja API
 ```
 
@@ -133,6 +143,16 @@ backend/
 2. Skopiuj **Client ID** i **Client Secret**
 3. Dodaj je do pliku `.env`
 4. Playlisty dla poszczególnych emocji są przechowywane w bazie danych w tabeli `emotion_playlists`
+
+### Jak działa losowanie piosenek?
+
+System **nie zwraca linków do całych playlist** - zamiast tego:
+1. Pobiera wszystkie piosenki z playlisty przypisanej do wykrytej emocji
+2. Losuje **5 piosenek** z tej playlisty
+3. Zapisuje wylosowane piosenki do bazy danych w tabeli `emotion_tracks`
+4. Zwraca te 5 piosenek w odpowiedzi API
+
+**Dzięki temu:** Za każdym razem gdy użytkownik wykryje tę samą emocję, dostanie inny, świeży zestaw piosenek!
 
 ## Troubleshooting
 

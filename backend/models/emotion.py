@@ -9,8 +9,10 @@ class EmotionRecord(db.Model):
     emotion_type_id = db.Column(db.Integer, db.ForeignKey('emotion_types.id'), nullable=False, index=True)
     confidence = db.Column(db.Float, nullable=False)
     timestamp = db.Column(db.DateTime, default=get_polish_time, nullable=False, index=True)
-    spotify_playlist_id = db.Column(db.String(100), nullable=True)
     user_feedback = db.Column(db.Boolean, nullable=True, default=None)
+
+    # Relationship to tracks
+    tracks = db.relationship('EmotionTrack', backref='emotion_record', lazy=True, cascade='all, delete-orphan')
 
     def to_dict(self):
         return {
@@ -19,6 +21,6 @@ class EmotionRecord(db.Model):
             'emotion_display_name': self.emotion_type.display_name if self.emotion_type else None,
             'confidence': self.confidence,
             'timestamp': self.timestamp.isoformat(),
-            'spotify_playlist_id': self.spotify_playlist_id,
-            'user_feedback': self.user_feedback
+            'user_feedback': self.user_feedback,
+            'tracks': [track.to_dict() for track in self.tracks] if self.tracks else []
         }

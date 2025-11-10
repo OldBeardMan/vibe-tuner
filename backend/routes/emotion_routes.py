@@ -3,6 +3,7 @@ from middleware.auth import token_required
 from services.emotion_detector import EmotionDetector
 from services.spotify_service import SpotifyService
 from models.emotion import EmotionRecord
+from models.emotion_track import EmotionTrack
 from models.emotion_type import EmotionType
 from models.database import db
 import os
@@ -70,25 +71,39 @@ def analyze_emotion():
             if not emotion_type:
                 return jsonify({'error': f"Invalid emotion type: {emotion_result['emotion']}"}), 400
 
-        # Get Spotify playlist for detected/provided emotion
-        playlist = spotify_service.get_playlist_for_emotion(emotion_result['emotion'])
+        # Get 5 random tracks from Spotify playlist for detected/provided emotion
+        tracks = spotify_service.get_random_tracks_for_emotion(emotion_result['emotion'], count=5)
 
         # Save emotion record to database
         emotion_record = EmotionRecord(
             user_id=request.current_user.id,
             emotion_type_id=emotion_type.id,
-            confidence=emotion_result['confidence'],
-            spotify_playlist_id=playlist.get('id') if playlist else None
+            confidence=emotion_result['confidence']
         )
 
         db.session.add(emotion_record)
+        db.session.flush()  # Get the emotion_record.id without committing
+
+        # Save tracks to database
+        for track in tracks:
+            emotion_track = EmotionTrack(
+                emotion_record_id=emotion_record.id,
+                track_name=track['name'],
+                artist=track['artist'],
+                spotify_track_id=track['spotify_id'],
+                preview_url=track.get('preview_url'),
+                external_url=track['external_url'],
+                album_image=track.get('album_image')
+            )
+            db.session.add(emotion_track)
+
         db.session.commit()
 
         return jsonify({
             'id': emotion_record.id,
             'emotion': emotion_result['emotion'],
             'confidence': emotion_result['confidence'],
-            'playlist': playlist,
+            'tracks': tracks,
             'timestamp': emotion_record.timestamp.isoformat()
         }), 200
 
