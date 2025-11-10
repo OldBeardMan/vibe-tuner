@@ -157,28 +157,30 @@ curl -X POST http://localhost:5000/api/emotion/analyze \
   "id": 123,
   "emotion": "happy",
   "confidence": 0.95,
-  "playlist": {
-    "id": "5rVURM4D0xpqfvqW1pHk6Q",
-    "name": "Happy Vibes",
-    "description": "Uplifting songs to boost your mood",
-    "emotion": "happy",
-    "tracks": [
-      {
-        "name": "Iceland",
-        "artist": "Matt Krupa",
-        "spotify_id": "60nZcImufyMA1MKQY3dcCH",
-        "preview_url": "https://...",
-        "external_url": "https://open.spotify.com/track/...",
-        "album_image": "https://..."
-      }
-    ],
-    "total_tracks": 20,
-    "external_url": "https://open.spotify.com/playlist/...",
-    "image": "https://..."
-  },
+  "tracks": [
+    {
+      "name": "Iceland",
+      "artist": "Matt Krupa",
+      "spotify_id": "60nZcImufyMA1MKQY3dcCH",
+      "preview_url": "https://...",
+      "external_url": "https://open.spotify.com/track/...",
+      "album_image": "https://..."
+    },
+    {
+      "name": "Song Title 2",
+      "artist": "Artist Name",
+      "spotify_id": "track_id_2",
+      "preview_url": "https://...",
+      "external_url": "https://open.spotify.com/track/...",
+      "album_image": "https://..."
+    }
+    // ... 3 more tracks (5 total)
+  ],
   "timestamp": "2025-01-15T10:30:00"
 }
 ```
+
+**Uwaga:** Endpoint zwraca **5 losowych piosenek** z playlisty przypisanej do danej emocji. Za każdym razem, gdy użytkownik wykryje tę samą emocję, dostanie inny zestaw piosenek.
 
 **Możliwe emocje:** `happy`, `sad`, `angry`, `fear`, `surprise`, `disgust`, `neutral`
 
@@ -212,8 +214,18 @@ Authorization: Bearer <token>
       "emotion_display_name": "Happy",
       "confidence": 0.95,
       "timestamp": "2025-01-15T10:30:00",
-      "spotify_playlist_id": "5rVURM4D0xpqfvqW1pHk6Q",
-      "user_feedback": true
+      "user_feedback": true,
+      "tracks": [
+        {
+          "name": "Iceland",
+          "artist": "Matt Krupa",
+          "spotify_id": "60nZcImufyMA1MKQY3dcCH",
+          "preview_url": "https://...",
+          "external_url": "https://open.spotify.com/track/...",
+          "album_image": "https://..."
+        }
+        // ... 4 more tracks
+      ]
     }
   ],
   "total": 150,
@@ -240,8 +252,18 @@ Authorization: Bearer <token>
   "emotion_display_name": "Happy",
   "confidence": 0.95,
   "timestamp": "2025-01-15T10:30:00",
-  "spotify_playlist_id": "5rVURM4D0xpqfvqW1pHk6Q",
-  "user_feedback": null
+  "user_feedback": null,
+  "tracks": [
+    {
+      "name": "Iceland",
+      "artist": "Matt Krupa",
+      "spotify_id": "60nZcImufyMA1MKQY3dcCH",
+      "preview_url": "https://...",
+      "external_url": "https://open.spotify.com/track/...",
+      "album_image": "https://..."
+    }
+    // ... 4 more tracks
+  ]
 }
 ```
 
@@ -278,8 +300,18 @@ Content-Type: application/json
     "emotion_display_name": "Happy",
     "confidence": 0.95,
     "timestamp": "2025-01-15T10:30:00",
-    "spotify_playlist_id": "5rVURM4D0xpqfvqW1pHk6Q",
-    "user_feedback": true
+    "user_feedback": true,
+    "tracks": [
+      {
+        "name": "Iceland",
+        "artist": "Matt Krupa",
+        "spotify_id": "60nZcImufyMA1MKQY3dcCH",
+        "preview_url": "https://...",
+        "external_url": "https://open.spotify.com/track/...",
+        "album_image": "https://..."
+      }
+      // ... 4 more tracks
+    ]
   }
 }
 ```
@@ -405,7 +437,7 @@ Backend będzie dostępny na `http://localhost:5000`
 
 ---
 
-## Spotify Playlists
+## Spotify Playlists i losowanie piosenek
 
 Backend używa 6 playlist Spotify (playlista calm vibes jest jednocześnie dla emocji neutral i fear) przechowywanych w bazie danych (tabela `emotion_playlists`):
 
@@ -419,7 +451,15 @@ Backend używa 6 playlist Spotify (playlista calm vibes jest jednocześnie dla e
 | **disgust** | `3waPZEYKqcy8AjnX1sZxd3` | Disgust Vibes |
 | **neutral** | `6oruukJQNs89eHY5gGCAXl` | Calm Vibes (feat. In The Autumn Forest) |
 
-Playlisty są automatycznie ładowane z bazy danych przez `SpotifyService`.
+### Jak działa losowanie piosenek?
+
+Zamiast zwracać link do całej playlisty, system:
+1. Pobiera wszystkie piosenki z playlisty przypisanej do wykrytej emocji
+2. Losuje **5 piosenek** z tej playlisty
+3. Zapisuje wylosowane piosenki do bazy danych w tabeli `emotion_tracks`
+4. Zwraca te 5 piosenek w odpowiedzi API
+
+**Dzięki temu:** Za każdym razem gdy użytkownik wykryje tę samą emocję, dostanie inny, świeży zestaw piosenek!
 
 **Fun fact:** Niektóre playlisty zawierają ambient/acoustic utwory [Matt Krupa](https://mattkrupa.net)
 
@@ -448,8 +488,17 @@ Playlisty są automatycznie ładowane z bazy danych przez `SpotifyService`.
 - `emotion_type_id` - FK do emotion_types
 - `confidence` - poziom pewności detekcji
 - `timestamp` - czas detekcji
-- `spotify_playlist_id` - ID playlisty przypisanej do emocji
 - `user_feedback` - feedback użytkownika (null/true/false)
+
+**emotion_tracks** - piosenki przypisane do rekordów emocji
+- `id` - klucz główny
+- `emotion_record_id` - FK do emotions (CASCADE DELETE)
+- `track_name` - nazwa piosenki
+- `artist` - artysta
+- `spotify_track_id` - ID utworu w Spotify
+- `preview_url` - URL do 30-sekundowego preview
+- `external_url` - link do utworu w Spotify
+- `album_image` - URL do okładki albumu
 
 **users** - użytkownicy
 - `id` - klucz główny
