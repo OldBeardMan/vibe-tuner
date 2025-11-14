@@ -39,11 +39,28 @@ CREATE TABLE IF NOT EXISTS emotions (
   timestamp TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(),
   spotify_playlist_id VARCHAR(100),
   user_feedback BOOLEAN DEFAULT NULL,
+  detection_source VARCHAR(20) NOT NULL DEFAULT 'image',
   CONSTRAINT fk_emotions_user
     FOREIGN KEY (user_id) REFERENCES users(id)
     ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT fk_emotions_type
     FOREIGN KEY (emotion_type_id) REFERENCES emotion_types(id)
+    ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT chk_detection_source CHECK (detection_source IN ('image', 'manual'))
+);
+
+-- Emotion tracks - tracks associated with emotion records
+CREATE TABLE IF NOT EXISTS emotion_tracks (
+  id SERIAL PRIMARY KEY,
+  emotion_record_id INT NOT NULL,
+  track_name VARCHAR(255) NOT NULL,
+  artist VARCHAR(255) NOT NULL,
+  spotify_track_id VARCHAR(100) NOT NULL,
+  preview_url VARCHAR(500),
+  external_url VARCHAR(500) NOT NULL,
+  album_image VARCHAR(500),
+  CONSTRAINT fk_emotion_tracks_record
+    FOREIGN KEY (emotion_record_id) REFERENCES emotions(id)
     ON DELETE CASCADE ON UPDATE CASCADE
 );
 
@@ -54,6 +71,7 @@ CREATE INDEX IF NOT EXISTS idx_emotions_user_id ON emotions (user_id);
 CREATE INDEX IF NOT EXISTS idx_emotions_timestamp ON emotions (timestamp);
 CREATE INDEX IF NOT EXISTS idx_emotions_type_id ON emotions (emotion_type_id);
 CREATE INDEX IF NOT EXISTS idx_emotion_playlists_type_id ON emotion_playlists (emotion_type_id);
+CREATE INDEX IF NOT EXISTS idx_emotion_tracks_record_id ON emotion_tracks (emotion_record_id);
 
 
 --------------------------------------------
