@@ -78,7 +78,8 @@ def analyze_emotion():
         emotion_record = EmotionRecord(
             user_id=request.current_user.id,
             emotion_type_id=emotion_type.id,
-            confidence=emotion_result['confidence']
+            confidence=emotion_result['confidence'],
+            detection_source='manual' if request.is_json else 'image'
         )
 
         db.session.add(emotion_record)
@@ -103,6 +104,7 @@ def analyze_emotion():
             'id': emotion_record.id,
             'emotion': emotion_result['emotion'],
             'confidence': emotion_result['confidence'],
+            'detection_source': emotion_record.detection_source,
             'tracks': tracks,
             'timestamp': emotion_record.timestamp.isoformat()
         }), 200

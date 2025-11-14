@@ -157,6 +157,7 @@ curl -X POST http://localhost:5000/api/emotion/analyze \
   "id": 123,
   "emotion": "happy",
   "confidence": 0.95,
+  "detection_source": "image",
   "tracks": [
     {
       "name": "Iceland",
@@ -179,6 +180,9 @@ curl -X POST http://localhost:5000/api/emotion/analyze \
   "timestamp": "2025-01-15T10:30:00"
 }
 ```
+
+**Pola odpowiedzi:**
+- `detection_source`: źródło wykrycia emocji - `"image"` (wykryte ze zdjęcia) lub `"manual"` (wybrane ręcznie przez użytkownika)
 
 **Uwaga:** Endpoint zwraca **5 losowych piosenek** z playlisty przypisanej do danej emocji. Za każdym razem, gdy użytkownik wykryje tę samą emocję, dostanie inny zestaw piosenek.
 
@@ -215,6 +219,7 @@ Authorization: Bearer <token>
       "confidence": 0.95,
       "timestamp": "2025-01-15T10:30:00",
       "user_feedback": true,
+      "detection_source": "image",
       "tracks": [
         {
           "name": "Iceland",
@@ -253,6 +258,7 @@ Authorization: Bearer <token>
   "confidence": 0.95,
   "timestamp": "2025-01-15T10:30:00",
   "user_feedback": null,
+  "detection_source": "manual",
   "tracks": [
     {
       "name": "Iceland",
@@ -301,6 +307,7 @@ Content-Type: application/json
     "confidence": 0.95,
     "timestamp": "2025-01-15T10:30:00",
     "user_feedback": true,
+    "detection_source": "image",
     "tracks": [
       {
         "name": "Iceland",
@@ -489,6 +496,7 @@ Zamiast zwracać link do całej playlisty, system:
 - `confidence` - poziom pewności detekcji
 - `timestamp` - czas detekcji
 - `user_feedback` - feedback użytkownika (null/true/false)
+- `detection_source` - źródło wykrycia ('image' / 'manual')
 
 **emotion_tracks** - piosenki przypisane do rekordów emocji
 - `id` - klucz główny
