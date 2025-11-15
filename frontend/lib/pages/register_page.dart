@@ -82,7 +82,7 @@ class _RegisterPageState extends State<RegisterPage> {
       _showBannerWithInfo(successInfo);
 
       Future.delayed(const Duration(milliseconds: 800), () {
-        if (mounted) context.go(AppPaths.baseLocation);
+        if (mounted) context.go(AppPaths.loginPage);
       });
     } on ApiException catch (e) {
       final info = mapApiExceptionToBannerInfo(e);
@@ -119,7 +119,13 @@ class _RegisterPageState extends State<RegisterPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const SizedBox(height: 12),
+                    IconButton(
+                      icon: Icon(Icons.arrow_back, color: theme.colorScheme.onSurface),
+                      onPressed: () => context.go(AppPaths.baseLocation),
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
+                    ),
+                    const SizedBox(height: 16),
                     Center(
                       child: Icon(Icons.person_outline, size: AppSizes.loginPageAvatarIconSize, color: theme.colorScheme.onSurface),
                     ),
@@ -237,7 +243,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 children: [
                   const Text(AppStrings.existAccountQuestion),
                   GestureDetector(
-                    onTap: () => context.go(AppPaths.baseLocation),
+                    onTap: () => context.go(AppPaths.loginPage),
                     child: Text(AppStrings.logIn, style: TextStyle(fontWeight: FontWeight.w700, color: theme.colorScheme.primary)),
                   )
                 ],

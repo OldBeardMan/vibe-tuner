@@ -5,9 +5,10 @@ import '../constants/app_strings.dart';
 
 class AnalyzeResult {
   final int? id;
-  final String emotion; // e.g. "happy"
+  final String emotion;
   final double? confidence;
   final Playlist? playlist;
+  final List<Track>? tracks;
   final DateTime? timestamp;
   final Map<String, dynamic> raw;
 
@@ -16,6 +17,7 @@ class AnalyzeResult {
     required this.emotion,
     this.confidence,
     this.playlist,
+    this.tracks,
     this.timestamp,
     required this.raw,
   });
@@ -31,13 +33,22 @@ class AnalyzeResult {
       ts = DateTime.tryParse(timestampStr)?.toLocal();
     }
 
+    List<Track>? topLevelTracks;
+    if (j['tracks'] is List) {
+      final list = (j['tracks'] as List<dynamic>);
+      topLevelTracks = list.map((t) {
+        if (t is Track) return t;
+        if (t is Map<String, dynamic>) return Track.fromJson(t);
+        return Track.fromJson(Map<String, dynamic>.from(t as Map));
+      }).toList();
+    }
+
     Playlist? playlist;
     if (j['playlist'] is Map<String, dynamic>) {
       playlist = Playlist.fromJson(j['playlist'] as Map<String, dynamic>);
     } else if (j['playlist'] is Map) {
       playlist = Playlist.fromJson(Map<String, dynamic>.from(j['playlist'] as Map));
     } else if (j['songs'] is List) {
-      // backward compatibility: convert old songs -> playlist.tracks
       final tracks = (j['songs'] as List<dynamic>).map((s) {
         if (s is Map<String, dynamic>) return Track.fromJson(s);
         return Track.fromJson(Map<String, dynamic>.from(s as Map));
@@ -50,6 +61,7 @@ class AnalyzeResult {
       emotion: emotion,
       confidence: confidence,
       playlist: playlist,
+      tracks: topLevelTracks,
       timestamp: ts,
       raw: Map<String, dynamic>.from(j),
     );
@@ -60,6 +72,7 @@ class AnalyzeResult {
     'emotion': emotion,
     'confidence': confidence,
     'playlist': playlist?.toJson(),
+    'tracks': tracks?.map((t) => t.toJson()).toList(),
     'timestamp': timestamp?.toUtc().toIso8601String(),
     'raw': raw,
   };

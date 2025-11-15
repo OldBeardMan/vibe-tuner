@@ -21,4 +21,6 @@ class AppColors {
   static const Color confidenceHigh = Colors.green;
   static const Color confidenceMedium = Colors.amber;
   static const Color confidenceLow = Colors.red;
+
+  static final deleteAccountButton = Colors.red.shade300;
 }

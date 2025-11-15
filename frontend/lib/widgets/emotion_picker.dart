@@ -249,7 +249,7 @@ class _EmotionPickerState extends State<EmotionPicker> with SingleTickerProvider
                           barrierColor: Colors.black.withValues(alpha: 0.4),
                           pageBuilder: (context, anim1, anim2) {
                             return Center(
-                              child: SelectedEmotionDialog(responseFuture: future),
+                              child: SelectedEmotionDialog(responseFuture: future, allowCorrection: false),
                             );
                           },
                         );

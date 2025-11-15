@@ -86,10 +86,10 @@ class AppSizes {
   static const double cameraPhotoBorderRadius = 18.0;
   static const double cameraButtonSpaceHeight = 110.0;
 
-  static const double loginPagePaddingHorizontal = 24.0;//
-  static const double loginPagePaddingVertical = 48.0;//
-  static const double loginPageAvatarIconSize = 64.0;//
-  static const double loginPageTitleFontSize = 18.0;//
+  static const double loginPagePaddingHorizontal = 24.0;
+  static const double loginPagePaddingVertical = 48.0;
+  static const double loginPageAvatarIconSize = 64.0;
+  static const double loginPageTitleFontSize = 18.0;
   static const double loginPageFormSpacing = 10.0;
   static const double loginPageBetweenTitleAndForm = 12.0;
   static const double loginPageFieldVerticalPadding = 14.0;
@@ -100,6 +100,15 @@ class AppSizes {
   static const double loginPageLoadingIndicatorSize = 18.0;
   static const double loginPageTopSpacer = 12.0;
   static const double loginPageLargeSpacer = 32.0;
+
+  static const double welcomePageLogoSize = 300.0;
+  static const double welcomePageLogoBorderRadius = 24.0;
+  static const double welcomePagePanelBorderRadius = 32.0;
+  static const double welcomePagePanelPadding = 32.0;
+  static const double welcomePageTitleFontSize = 28.0;
+  static const double welcomePageDescriptionFontSize = 14.0;
+  static const double welcomePageButtonVerticalPadding = 16.0;
+  static const double welcomePageButtonFontSize = 16.0;
 
   static const double logoutPageDialogWidth = 340.0;
   static const double logoutPageDialogPadding = 18.0;

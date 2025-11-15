@@ -27,3 +27,18 @@ BannerInfo mapApiExceptionToBannerInfo(ApiException e) {
 BannerInfo mapGenericExceptionToBannerInfo(Object e) {
   return BannerInfo('${AppStrings.errorOccurred}: ${e.toString()}', AppColors.apiError);
 }
+
+class DeleteAccountErrors {
+  static String fromStatusCode(int? statusCode) {
+    switch (statusCode) {
+      case 400: return AppStrings.deleteAccountErrorMissingPassword;
+      case 401: return AppStrings.deleteAccountErrorInvalidPasswordOrSession;
+      case 403: return AppStrings.deleteAccountErrorNoPermission;
+      case 404: return AppStrings.deleteAccountErrorUserNotFound;
+      case 500: return AppStrings.deleteAccountErrorServer;
+      case null: return AppStrings.deleteAccountErrorDefault;
+      default: return '${AppStrings.deleteAccountErrorDefault} HTTP: $statusCode';
+    }
+  }
+}
+

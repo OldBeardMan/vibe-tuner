@@ -28,6 +28,8 @@ dependencies:
   path: ^1.8.2
   fl_chart: ^1.1.1
   url_launcher: ^6.3.0
+  just_audio: ^0.9.40
+  cached_network_image: ^3.2.3
 
 dev_dependencies:
   flutter_test:
@@ -40,3 +42,4 @@ flutter:
 
   assets:
     - lib/assets/icons/
+    - lib/assets/images/

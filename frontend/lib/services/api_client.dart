@@ -36,6 +36,15 @@ class ApiClient {
     return h;
   }
 
+  Map<String, String> _buildHeaders([Map<String, String>? extra]) {
+    final h = <String, String>{
+      'Content-Type': 'application/json',
+      ...?extra,
+    };
+    if (_token != null) h['Authorization'] = 'Bearer $_token';
+    return h;
+  }
+
   Uri _uri(String path) {
     if (path.startsWith('http')) return Uri.parse(path);
     return Uri.parse(baseUrl + path);
@@ -51,6 +60,31 @@ class ApiClient {
     final uri = _uri(path);
     final res = await http.get(uri, headers: _defaultHeaders(headers: headers));
     return _processResponse(res);
+  }
+
+  Future<dynamic> delete(String path, {Map<String, dynamic>? body, Map<String, String>? extraHeaders}) async {
+    final uri = Uri.parse(baseUrl + path);
+    final headers = _buildHeaders(extraHeaders);
+    final bodyEncoded = body != null ? jsonEncode(body) : null;
+
+    final resp = await http.Client().delete(uri, headers: headers, body: bodyEncoded);
+    final code = resp.statusCode;
+    final txt = resp.body;
+    if (code >= 200 && code < 300) {
+      if (txt.isEmpty) return null;
+      try {
+        return jsonDecode(txt);
+      } catch (_) {
+        return txt;
+      }
+    }
+
+    String msg = 'HTTP $code';
+    try {
+      final parsed = jsonDecode(txt);
+      if (parsed is Map && parsed['message'] != null) msg = parsed['message'].toString();
+    } catch (_) {}
+    throw ApiException(msg);
   }
 
   Map<String, dynamic> _processResponse(http.Response res) {

@@ -2,6 +2,7 @@ class AppPaths {
 
   // Routes
   static const baseLocation = "/";
+  static const welcomePage = "/welcome";
   static const homePage = "/home";
   static const userPage = "/user";
   static const historyPage = "/history";
@@ -16,6 +17,7 @@ class AppPaths {
   static const baseURL = "http://10.0.2.2:5000/api";
   static const register = "/auth/register";
   static const login = "/auth/login";
+  static const deleteAccount = "/auth/account";
   static const emotionAnalyze = "/emotion/analyze";
   static const analyticsDistribution = '/analytics/distribution';
   static const analyticsByDay = '/analytics/by-day';
@@ -30,6 +32,10 @@ class AppPaths {
   static const emotionFear = 'lib/assets/icons/sentiment_fear.svg';
   static const emotionDisgust = 'lib/assets/icons/sentiment_disgust.svg';
   static const emotionNeutral = 'lib/assets/icons/sentiment_calm.svg';
+
+  // Images
+  static const logoLight = 'lib/assets/images/vibe_tuner_logo_light.png';
+  static const logoDark = 'lib/assets/images/vibe_tuner_logo_dark.png';
 
   // Links
   static const githubUrl = 'https://github.com/OldBeardMan/vibe-tuner';

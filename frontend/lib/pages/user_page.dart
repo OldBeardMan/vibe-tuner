@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
@@ -5,15 +6,25 @@ import 'package:provider/provider.dart';
 import '../constants/app_strings.dart';
 import '../constants/app_sizes.dart';
 import '../providers/theme_provider.dart';
+import '../widgets/delete_account_dialog.dart';
 import '../widgets/logout_card.dart';
 import 'info_page.dart';
 
 class UserPage extends StatelessWidget {
   const UserPage({super.key});
 
+  Future<void> _showDeleteAccountDialog(BuildContext context) async {
+    await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => const DeleteAccountDialog(),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final themeProv = Provider.of<ThemeProvider>(context);
+    var theme = Theme.of(context);
 
     return Scaffold(
       appBar: AppBar(
@@ -80,7 +91,54 @@ class UserPage extends StatelessWidget {
               ],
             ),
             const SizedBox(height: AppSizes.userPageGroupGap),
+
             const LogoutCard(),
+
+            const SizedBox(height: AppSizes.pageNormalGap,),
+
+            Padding(
+              padding: const EdgeInsets.only(
+                left: AppSizes.expandableCardPadding,
+                right: AppSizes.expandableCardPadding,
+              ),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.error,
+                  borderRadius: BorderRadius.circular(AppSizes.expandableCardRadius),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.12),
+                      blurRadius: AppSizes.expandableCardBlurRadius,
+                      offset: AppSizes.expandableCardBlurOffset,
+                    ),
+                  ],
+                ),
+                padding: const EdgeInsets.all(AppSizes.expandableCardPaddingInside),
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(8),
+                  onTap: () =>  _showDeleteAccountDialog(context),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 6),
+                          child: Text(AppStrings.userPageDeleteAccount,
+                              style: GoogleFonts.inter(fontSize: 16)
+                          ),
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: () => _showDeleteAccountDialog(context),
+                        icon: Icon(Icons.chevron_right, color: theme.colorScheme.onSurface),
+                        splashRadius: 20,
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
             const SizedBox(height: AppSizes.userPageGroupGap),
           ],
         ),
@@ -88,6 +146,7 @@ class UserPage extends StatelessWidget {
     );
   }
 }
+
 class _GroupContainer extends StatelessWidget {
   final List<Widget> children;
   const _GroupContainer({required this.children});
