@@ -5,7 +5,6 @@ class Track {
   final String? previewUrl;
   final String? externalUrl;
   final String? albumImage;
-  final int? durationMs; // optional, may be missing
 
   Track({
     required this.name,
@@ -14,18 +13,37 @@ class Track {
     this.previewUrl,
     this.externalUrl,
     this.albumImage,
-    this.durationMs,
   });
 
-  factory Track.fromJson(Map<String, dynamic> j) {
+  factory Track.fromJson(Map<String, dynamic> raw) {
+    final Map<String, dynamic> json = {};
+    raw.forEach((k, v) {
+      json[k.toString()] = v;
+    });
+
+    String? pick(List<String> keys) {
+      for (final k in keys) {
+        if (json.containsKey(k) && json[k] != null) {
+          return json[k].toString();
+        }
+      }
+      return null;
+    }
+
+    final name = pick(['name', 'title']) ?? '';
+    final artist = pick(['artist', 'artists', 'artist_name']) ?? '';
+    final spotifyId = pick(['spotify_id', 'spotifyId', 'id']);
+    final previewUrl = pick(['preview_url', 'previewUrl', 'preview']);
+    final externalUrl = pick(['external_url', 'externalUrl', 'url', 'external']);
+    final albumImage = pick(['album_image', 'albumImage', 'image', 'album_image_url']);
+
     return Track(
-      name: j['name'] as String? ?? j['title'] as String? ?? '',
-      artist: j['artist'] as String? ?? '',
-      spotifyId: j['spotify_id'] as String? ?? j['spotifyId'] as String?,
-      previewUrl: j['preview_url'] as String?,
-      externalUrl: j['external_url'] as String?,
-      albumImage: j['album_image'] as String? ?? j['image'] as String?,
-      durationMs: (j['durationMs'] as num?)?.toInt(),
+      name: name,
+      artist: artist,
+      spotifyId: spotifyId,
+      previewUrl: previewUrl,
+      externalUrl: externalUrl,
+      albumImage: albumImage,
     );
   }
 
@@ -36,6 +54,5 @@ class Track {
     'preview_url': previewUrl,
     'external_url': externalUrl,
     'album_image': albumImage,
-    'durationMs': durationMs,
   };
 }

@@ -4,6 +4,7 @@ import 'package:vibe_tuner/constants/app_paths.dart';
 import 'package:vibe_tuner/pages/camera_page.dart';
 import 'package:vibe_tuner/pages/recommended_songs_page.dart';
 import 'package:vibe_tuner/pages/register_page.dart';
+import 'package:vibe_tuner/pages/welcome_page.dart';
 import 'package:vibe_tuner/widgets/selected_emotion_dialog.dart';
 import 'constants/app_strings.dart';
 import 'models/navigation_args.dart';
@@ -16,7 +17,8 @@ import 'pages/user_page.dart';
 final GoRouter router = GoRouter(
   initialLocation: AppPaths.baseLocation,
   routes: [
-    GoRoute(path: AppPaths.baseLocation, builder: (context, state) => const LoginPage()),
+    GoRoute(path: AppPaths.baseLocation, builder: (context, state) => const WelcomePage()),
+    GoRoute(path: AppPaths.welcomePage, builder: (context, state) => const WelcomePage()),
     ShellRoute(
       builder: (context, state, child) {
         final location = state.uri.toString();
@@ -32,7 +34,8 @@ final GoRouter router = GoRouter(
         final hideOn = [
           AppPaths.cameraPage,
           AppPaths.registerPage,
-          AppPaths.loginPage
+          AppPaths.loginPage,
+          AppPaths.welcomePage,
         ];
         final bool showBottomBar = !hideOn.any((p) => location.startsWith(p));
 
@@ -69,9 +72,9 @@ final GoRouter router = GoRouter(
         GoRoute(path: AppPaths.emotionDialog, builder: (context, state) => const SelectedEmotionDialog()),
         GoRoute(path: AppPaths.cameraPage, builder: (context, state) => const CameraPage()),
         GoRoute(path: AppPaths.registerPage, builder: (context, state) => const RegisterPage()),
-        GoRoute(path: AppPaths.baseLocation, builder: (context, state) => const LoginPage()),
       ],
     ),
     GoRoute(path: AppPaths.userPage, builder: (context, state) => const UserPage()),
+    GoRoute(path: AppPaths.loginPage, builder: (context, state) => const LoginPage()),
   ],
 );

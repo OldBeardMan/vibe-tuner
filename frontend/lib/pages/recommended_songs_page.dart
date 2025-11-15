@@ -6,8 +6,9 @@ import 'package:vibe_tuner/constants/app_paths.dart';
 import 'package:vibe_tuner/constants/app_sizes.dart';
 import 'package:vibe_tuner/constants/mapping/emotion_mapping.dart';
 import 'package:vibe_tuner/constants/app_strings.dart';
-import 'package:vibe_tuner/models/track.dart';
 import 'package:vibe_tuner/models/navigation_args.dart';
+
+import '../widgets/song_row.dart';
 
 class RecommendedSongsPage extends StatelessWidget {
   final RecommendedSongsArgs args;
@@ -61,7 +62,7 @@ class RecommendedSongsPage extends StatelessWidget {
                   separatorBuilder: (_, __) => const SizedBox(height: AppSizes.recommendedSongsPageSongsSpace),
                   itemBuilder: (context, index) {
                     final song = songs[index];
-                    return _buildSongRow(index + 1, song, context);
+                    return SongRowView(number: index + 1, song: song);
                   },
                 ),
               ),
@@ -101,36 +102,6 @@ class RecommendedSongsPage extends StatelessWidget {
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildSongRow(int number, Track song, BuildContext context) {
-    final theme = Theme.of(context);
-    return Container(
-      height: AppSizes.recommendedSongsPageSongAreaHeight,
-      decoration: BoxDecoration(color: theme.colorScheme.primaryContainer, borderRadius: BorderRadius.circular(22)),
-      padding: const EdgeInsets.symmetric(horizontal: AppSizes.recommendedSongsPageSongAreaHorizontalPadding),
-      child: Row(
-        children: [
-          Container(
-            width: AppSizes.recommendedSongsPageNumbersSize,
-            height: AppSizes.recommendedSongsPageNumbersSize,
-            decoration: BoxDecoration(color: theme.colorScheme.surface, shape: BoxShape.circle),
-            alignment: Alignment.center,
-            child: Text(number.toString(), style: theme.textTheme.bodyMedium),
-          ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Column(mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(song.name, style: theme.textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w700)),
-              const SizedBox(height: 4),
-              Text(song.artist, style: theme.textTheme.bodySmall),
-            ]),
-          ),
-          const SizedBox(width: 8),
-          const Icon(Icons.music_note_outlined),
-        ],
       ),
     );
   }

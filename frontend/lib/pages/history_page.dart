@@ -29,7 +29,6 @@ class _HistoryPageState extends State<HistoryPage> {
   int? _total;
 
   final List<_HistoryRecord> _fetchedRecords = [];
-
   final List<_HistoryRecord> _displayedRecords = [];
 
   final Set<int> _selectedEmotionIds = {};
@@ -84,70 +83,136 @@ class _HistoryPageState extends State<HistoryPage> {
       }
     });
 
-    try {
-      final path = _buildPath(limit: _limit, offset: _offset);
-      final res = await ApiClient.instance.get(path);
-      final rawRecords = (res['records'] as List<dynamic>?) ?? [];
-      final parsed = rawRecords.map((r) {
-        final m = r as Map<String, dynamic>;
-        final confidence = (m['confidence'] is num) ? (m['confidence'] as num).toDouble() : double.tryParse('${m['confidence']}') ?? 0.0;
-        final emotionKey = (m['emotion'] ?? m['emotion_display_name'])?.toString();
-        final timestampStr = m['timestamp']?.toString();
-        DateTime ts;
-        try {
-          ts = timestampStr != null ? DateTime.parse(timestampStr) : DateTime.now();
-        } catch (_) {
-          ts = DateTime.now();
+    const int maxRetries = 3;
+    int attempt = 0;
+    while (attempt < maxRetries) {
+      attempt++;
+      try {
+        final path = _buildPath(limit: _limit, offset: _offset);
+        final res = await ApiClient.instance.get(path);
+
+        final rawRecords = (res['records'] as List<dynamic>?) ?? [];
+        final parsed = <_HistoryRecord>[];
+
+        for (final r in rawRecords) {
+          final m = r as Map<String, dynamic>;
+
+          final confidence = (m['confidence'] is num)
+              ? (m['confidence'] as num).toDouble()
+              : double.tryParse('${m['confidence']}') ?? 0.0;
+
+          final emotionKey = (m['emotion'] ?? m['emotion_display_name'])?.toString();
+          final timestampStr = m['timestamp']?.toString();
+          DateTime ts;
+          try {
+            ts = timestampStr != null ? DateTime.parse(timestampStr) : DateTime.now();
+          } catch (_) {
+            ts = DateTime.now();
+          }
+
+          bool? userFeedback;
+          if (m.containsKey('user_feedback')) {
+            final rawUf = m['user_feedback'];
+            if (rawUf == null) {
+              userFeedback = null;
+            } else {
+              userFeedback = rawUf == true;
+            }
+          } else {
+            userFeedback = null;
+          }
+
+          String source;
+          final detectionSource = m['detection_source']?.toString();
+          if (detectionSource != null) {
+            source = detectionSource.toLowerCase() == 'manual' ? 'manual' : 'face';
+          } else {
+            final isManual = userFeedback == true;
+            source = isManual ? 'manual' : 'face';
+          }
+
+          List<Song> songs = [];
+          if (m.containsKey('tracks') && m['tracks'] is List) {
+            try {
+              final list = (m['tracks'] as List).cast<Map<String, dynamic>>();
+              songs = list.map((t) {
+                return Song(
+                  title: (t['name'] ?? '').toString(),
+                  artist: (t['artist'] ?? '').toString(),
+                  spotifyId: (t['spotify_id'] ?? t['spotifyId'] ?? '').toString(),
+                  previewUrl: (t['preview_url'] ?? '').toString(),
+                  externalUrl: (t['external_url'] ?? '').toString(),
+                  albumImage: (t['album_image'] ?? '').toString(),
+                );
+              }).toList();
+            } catch (_) {
+              songs = [];
+            }
+          }
+
+          final record = _HistoryRecord(
+            id: m['id'] is int ? m['id'] as int : int.tryParse('${m['id']}') ?? 0,
+            emotionKey: emotionKey,
+            confidence: confidence.clamp(0.0, 1.0),
+            timestamp: ts,
+            source: source,
+            raw: m,
+            userFeedback: userFeedback,
+            songs: songs,
+          );
+
+          parsed.add(record);
         }
-        final isManual = (m['user_feedback'] == true) || (confidence >= 0.999);
-        final source = isManual ? 'manual' : 'face';
 
-        return _HistoryRecord(
-          id: m['id'] is int ? m['id'] as int : int.tryParse('${m['id']}') ?? 0,
-          emotionKey: emotionKey,
-          confidence: confidence.clamp(0.0, 1.0),
-          timestamp: ts,
-          source: source,
-          raw: m,
-        );
-      }).toList();
+        final totalFromResp =
+        (res['total'] is int) ? res['total'] as int : int.tryParse('${res['total'] ?? ''}');
 
-      final totalFromResp =
-      (res['total'] is int) ? res['total'] as int : int.tryParse('${res['total'] ?? ''}');
+        setState(() {
+          _total = totalFromResp;
+          if (refresh) {
+            _fetchedRecords.clear();
+            _fetchedRecords.addAll(parsed);
+          } else {
+            _fetchedRecords.addAll(parsed);
+          }
 
-      setState(() {
-        _total = totalFromResp;
-        if (refresh) {
-          _fetchedRecords.clear();
-          _fetchedRecords.addAll(parsed);
+          _offset = _fetchedRecords.length;
+          if (_total != null) {
+            _hasMore = _fetchedRecords.length < _total!;
+          } else {
+            _hasMore = parsed.length >= _limit;
+          }
+
+          _applyClientFilters();
+
+          _loading = false;
+          _loadingMore = false;
+        });
+
+        debugPrint('Fetched ${parsed.length} history records (total: $_total).');
+
+        break;
+      } on ApiException catch (e) {
+        setState(() {
+          _loading = false;
+          _loadingMore = false;
+          _error = e.message;
+        });
+        break;
+      } on Exception catch (e) {
+        debugPrint('Fetch history attempt $attempt failed: $e');
+        if (attempt >= maxRetries) {
+          setState(() {
+            _loading = false;
+            _loadingMore = false;
+            _error = e.toString();
+          });
+          break;
         } else {
-          _fetchedRecords.addAll(parsed);
+          await Future.delayed(Duration(milliseconds: 300 * attempt));
+          continue;
         }
-
-        _offset = _fetchedRecords.length;
-        if (_total != null) {
-          _hasMore = _fetchedRecords.length < _total!;
-        } else {
-          _hasMore = parsed.length >= _limit;
-        }
-
-        _applyClientFilters();
-
-        _loading = false;
-        _loadingMore = false;
-      });
-    } on ApiException catch (e) {
-      setState(() {
-        _loading = false;
-        _loadingMore = false;
-        _error = e.message;
-      });
-    } catch (e) {
-      setState(() {
-        _loading = false;
-        _loadingMore = false;
-        _error = e.toString();
-      });
+      }
     }
   }
 
@@ -411,7 +476,9 @@ class _HistoryPageState extends State<HistoryPage> {
                     emotion: emotion,
                     dateTime: r.timestamp,
                     confidence: r.confidence,
-                    songs: null,
+                    songs: r.songs,
+                    userFeedback: r.userFeedback,
+                    source: r.source,
                     onToggle: (expanded) {},
                   );
                 },
@@ -445,6 +512,9 @@ class _HistoryRecord {
   final DateTime timestamp;
   final String source;
   final Map<String, dynamic> raw;
+  final bool? userFeedback;
+  List<Song> songs;
+
   _HistoryRecord({
     required this.id,
     required this.emotionKey,
@@ -452,5 +522,7 @@ class _HistoryRecord {
     required this.timestamp,
     required this.source,
     required this.raw,
+    required this.userFeedback,
+    this.songs = const [],
   });
 }

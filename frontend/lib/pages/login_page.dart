@@ -100,7 +100,13 @@ class _LoginPageState extends State<LoginPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const SizedBox(height: AppSizes.loginPageTopSpacer),
+                    IconButton(
+                      icon: Icon(Icons.arrow_back, color: theme.colorScheme.onSurface),
+                      onPressed: () => context.go(AppPaths.baseLocation),
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
+                    ),
+                    const SizedBox(height: 16),
                     Center(
                       child: Icon(Icons.person_outline, size: AppSizes.loginPageAvatarIconSize, color: theme.colorScheme.onSurface),
                     ),

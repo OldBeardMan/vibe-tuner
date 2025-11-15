@@ -17,6 +17,10 @@ class AppStrings {
 
   static const unknown = 'unknown';
 
+  // Welcome page
+  static const welcomePageTitle = 'Witaj';
+  static const welcomePageDescription = 'Odkryj muzykę dopasowaną do Twojego nastroju. Analizuj emocje i znajdź idealne utwory dla siebie.';
+
   // Home page
   static const homePagePhotoButton = 'Zrób zdjęcie';
   static const homePageOr = 'lub';
@@ -168,4 +172,22 @@ class AppStrings {
   static const historyPageEndOfResults = 'Koniec wyników';
   static const historyCardManualEmotion = 'Emocja wybrana ręcznie';
   static const historyCardClassificationConfidence = 'Pewność klasyfikacji';
+  static const historyCardNoSongs = 'Brak propozycji utworów dla tej rekomendacji';
+  static const historyCardNotMatching = 'NIEZGODNE';
+  static const historyCardMoreSongsTemplate = '+{count} więcej';
+
+  // Delete Account
+  static const userPageDeleteAccount = 'Usuń konto';
+  static const deleteAccountTitle = 'Usuń konto';
+  static const deleteAccountWarning = 'Usunięcie konta jest nieodwracalne. Wprowadź hasło, aby potwierdzić.';
+  static const deleteAccountPasswordLabel = 'Hasło';
+  static const deleteAccountPasswordEmpty = 'Podaj hasło do potwierdzenia';
+  static const deleteAccountButtonDelete = 'Usuń';
+  static const deleteAccountButtonCancel = 'Anuluj';
+  static const deleteAccountErrorMissingPassword = 'Musisz podać hasło.';
+  static const deleteAccountErrorInvalidPasswordOrSession = 'Hasło niepoprawne.';
+  static const deleteAccountErrorNoPermission = 'Brak uprawnień do wykonania tej operacji.';
+  static const deleteAccountErrorUserNotFound = 'Nie znaleziono użytkownika.';
+  static const deleteAccountErrorServer = 'Wystąpił błąd serwera. Spróbuj ponownie później.';
+  static const deleteAccountErrorDefault = 'Wystąpił błąd. Spróbuj ponownie.';
 }

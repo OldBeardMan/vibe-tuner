@@ -192,9 +192,10 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
                       GestureDetector(
                         onTap: (p.isBusy || p.isSending) ? null : () {
                           try {
-                            final Future<dynamic> sendFuture = p.sendCapturedImage(token: context.read<AuthProvider>().token);
-                            p.reset();
+                            final String? token = context.read<AuthProvider>().token;
+                            final Future<dynamic> sendFuture = p.sendCapturedImage(token: token);
 
+                            p.reset();
                             context.go(AppPaths.homePage);
 
                             SchedulerBinding.instance.addPostFrameCallback((_) {
@@ -204,12 +205,18 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
                                 barrierLabel: 'SelectedEmotionDialog',
                                 barrierColor: Colors.black.withValues(alpha: 0.4),
                                 transitionDuration: const Duration(milliseconds: 220),
-                                pageBuilder: (ctx, a1, a2) =>
-                                    Center(child: SelectedEmotionDialog(responseFuture: sendFuture)),
+                                pageBuilder: (ctx, a1, a2) => Center(
+                                  child: SelectedEmotionDialog(
+                                    responseFuture: sendFuture,
+                                    allowCorrection: true,
+                                    authToken: token,
+                                  ),
+                                ),
                               );
                             });
                           } catch (e) {
                             debugPrint('send error: $e');
+                            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Błąd wysyłania zdjęcia.')));
                           }
                         },
                         child: Container(
@@ -221,6 +228,7 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
                           child: Icon(Icons.send, color: Theme.of(context).colorScheme.surface, size: AppSizes.cameraSideButtonSize),
                         ),
                       ),
+
                     ],
                   ),
                 ),
