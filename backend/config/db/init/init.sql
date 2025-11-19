@@ -78,7 +78,7 @@ CREATE INDEX IF NOT EXISTS idx_emotion_tracks_record_id ON emotion_tracks (emoti
 -- ADD DATA (idempotent)
 --------------------------------------------
 
--- Insert emotion types (DeepFace emotions only)
+-- Insert emotion types
 INSERT INTO emotion_types (name, display_name, description) VALUES
   ('happy', 'Happy', 'Feeling joyful, cheerful, and content'),
   ('sad', 'Sad', 'Feeling down, melancholic, or blue'),
