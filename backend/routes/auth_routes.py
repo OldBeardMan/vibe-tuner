@@ -66,11 +66,6 @@ def register():
 
 @auth_bp.route('/auth/login', methods=['POST'])
 def login():
-    """
-    Login user and return JWT token
-    Expected JSON: { "email": "user@example.com", "password": "password123" }
-    Returns: { "token": "jwt_token", "user": {...} }
-    """
     try:
         data = request.get_json()
 
@@ -83,13 +78,11 @@ def login():
         if not email or not password:
             return jsonify({'error': 'Email and password are required'}), 400
 
-        # Find user
         user = User.query.filter_by(email=email.lower()).first()
 
         if not user or not user.check_password(password):
             return jsonify({'error': 'Invalid email or password'}), 401
 
-        # Generate JWT token (expires in 7 days)
         token = jwt.encode({
             'user_id': user.id,
             'exp': get_polish_time() + timedelta(days=7)
