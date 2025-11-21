@@ -8,7 +8,6 @@ from models.emotion_type import EmotionType
 
 class EmotionDetector:
     def __init__(self):
-        # Cache valid emotions from database
         self._valid_emotions = None
 
     def _get_valid_emotions(self):
@@ -17,7 +16,6 @@ class EmotionDetector:
             try:
                 self._valid_emotions = set(EmotionType.get_all_names())
             except:
-                # Fallback if database is not available - DeepFace emotions
                 self._valid_emotions = {'happy', 'sad', 'angry', 'fear', 'surprise', 'disgust', 'neutral'}
         return self._valid_emotions
 
@@ -28,44 +26,34 @@ class EmotionDetector:
     
     def detect_emotion(self, image_file):
         try:
-            # Read image from uploaded file
             image_bytes = image_file.read()
-            image_file.seek(0)  # Reset file pointer
             
-            # Convert to PIL Image
-            pil_image = Image.open(io.BytesIO(image_bytes))
+            pil_image = Image.open(io.BytesIO(image_bytes))#to pil image
             
-            # Convert PIL to OpenCV format
-            opencv_image = cv2.cvtColor(np.array(pil_image), cv2.COLOR_RGB2BGR)
+            opencv_image = cv2.cvtColor(np.array(pil_image), cv2.COLOR_RGB2BGR) #to opencv format
+
+            image_hash = hashlib.md5(image_bytes).hexdigest() #image hash for storage
             
-            # Create image hash for storage
-            image_hash = hashlib.md5(image_bytes).hexdigest()
-            
-            # Detect faces first
             face_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
             gray = cv2.cvtColor(opencv_image, cv2.COLOR_BGR2GRAY)
-            faces = face_cascade.detectMultiScale(gray, 1.1, 4)
+            faces = face_cascade.detectMultiScale(gray, 1.1, 4) #detecting face first
             
             if len(faces) == 0:
                 return None
             
-            # Use DeepFace for emotion detection
-            result = DeepFace.analyze(
+            result = DeepFace.analyze( #deepface analyze
                 opencv_image, 
                 actions=['emotion'],
                 enforce_detection=False
             )
             
-            # Handle both single result and list results
-            if isinstance(result, list):
+            if isinstance(result, list): # Handle both single result and list results
                 result = result[0]
-            
-            # Get dominant emotion from DeepFace
+
             dominant_emotion = result['dominant_emotion']
             confidence = float(result['emotion'][dominant_emotion] / 100.0)
 
-            # Validate emotion exists in database
-            validated_emotion = self._validate_emotion(dominant_emotion)
+            validated_emotion = self._validate_emotion(dominant_emotion) #checking if it exist in database
 
             return {
                 'emotion': validated_emotion,
