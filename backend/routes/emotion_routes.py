@@ -15,17 +15,7 @@ spotify_service = SpotifyService()
 @emotion_bp.route('/emotion/analyze', methods=['POST'])
 @token_required
 def analyze_emotion():
-    """
-    Analyze emotion from uploaded image OR accept manually provided emotion
-
-    Two modes:
-    1. Image mode: multipart/form-data with 'image' field
-    2. Manual mode: JSON with 'emotion' field and optional 'confidence' field
-
-    Returns: emotion, confidence, playlist info
-    """
     try:
-        # Check if this is manual emotion input (JSON)
         if request.is_json:
             data = request.get_json()
 
@@ -33,13 +23,11 @@ def analyze_emotion():
                 return jsonify({'error': 'No emotion provided in request body'}), 400
 
             emotion_name = data.get('emotion')
-            confidence = data.get('confidence', 1.0)  # Default confidence to 1.0 for manual input
+            confidence = data.get('confidence', 1.0)
 
-            # Validate confidence
             if not isinstance(confidence, (int, float)) or not (0 <= confidence <= 1):
                 return jsonify({'error': 'Confidence must be a number between 0 and 1'}), 400
 
-            # Get emotion type from database
             emotion_type = EmotionType.get_by_name(emotion_name)
             if not emotion_type:
                 return jsonify({'error': f"Invalid emotion type: {emotion_name}"}), 400
@@ -49,9 +37,7 @@ def analyze_emotion():
                 'confidence': confidence
             }
 
-        # Otherwise, expect image upload (original behavior)
         else:
-            # Check if image is in request
             if 'image' not in request.files:
                 return jsonify({'error': 'No image or emotion data provided'}), 400
 
@@ -60,21 +46,17 @@ def analyze_emotion():
             if image_file.filename == '':
                 return jsonify({'error': 'No image selected'}), 400
 
-            # Detect emotion using DeepFace
             emotion_result = emotion_detector.detect_emotion(image_file)
 
             if not emotion_result:
                 return jsonify({'error': 'Could not detect face or emotion in the image'}), 400
 
-            # Get emotion type from database
             emotion_type = EmotionType.get_by_name(emotion_result['emotion'])
             if not emotion_type:
                 return jsonify({'error': f"Invalid emotion type: {emotion_result['emotion']}"}), 400
 
-        # Get 5 random tracks from Spotify playlist for detected/provided emotion
         tracks = spotify_service.get_random_tracks_for_emotion(emotion_result['emotion'], count=5)
 
-        # Save emotion record to database
         emotion_record = EmotionRecord(
             user_id=request.current_user.id,
             emotion_type_id=emotion_type.id,
@@ -83,9 +65,8 @@ def analyze_emotion():
         )
 
         db.session.add(emotion_record)
-        db.session.flush()  # Get the emotion_record.id without committing
+        db.session.flush()
 
-        # Save tracks to database
         for track in tracks:
             emotion_track = EmotionTrack(
                 emotion_record_id=emotion_record.id,
@@ -117,21 +98,13 @@ def analyze_emotion():
 @emotion_bp.route('/emotion/history', methods=['GET'])
 @token_required
 def get_emotion_history():
-    """
-    Get all emotion records for current user
-    Optional query params:
-    - limit: number of records (default: 50)
-    - offset: pagination offset (default: 0)
-    """
     try:
         limit = request.args.get('limit', 50, type=int)
         offset = request.args.get('offset', 0, type=int)
 
-        # Validate limits
         if limit > 100:
             limit = 100
 
-        # Query user's emotion records (newest first)
         records = EmotionRecord.query.filter_by(
             user_id=request.current_user.id
         ).order_by(
@@ -156,9 +129,6 @@ def get_emotion_history():
 @emotion_bp.route('/emotion/<int:emotion_id>', methods=['GET'])
 @token_required
 def get_emotion(emotion_id):
-    """
-    Get a single emotion record by ID
-    """
     try:
         emotion_record = EmotionRecord.query.filter_by(
             id=emotion_id,
@@ -177,18 +147,7 @@ def get_emotion(emotion_id):
 @emotion_bp.route('/emotion/<int:emotion_id>/feedback', methods=['POST'])
 @token_required
 def set_emotion_feedback(emotion_id):
-    """
-    Set user feedback for a detected emotion
-
-    Request body (JSON):
-    {
-        "agrees": true/false  // true = user agrees, false = user disagrees
-    }
-
-    Returns: updated emotion record
-    """
     try:
-        # Get the emotion record
         emotion_record = EmotionRecord.query.filter_by(
             id=emotion_id,
             user_id=request.current_user.id
@@ -197,7 +156,6 @@ def set_emotion_feedback(emotion_id):
         if not emotion_record:
             return jsonify({'error': 'Emotion record not found'}), 404
 
-        # Get feedback from request
         data = request.get_json()
 
         if 'agrees' not in data:
@@ -205,11 +163,9 @@ def set_emotion_feedback(emotion_id):
 
         agrees = data.get('agrees')
 
-        # Validate that agrees is a boolean
         if not isinstance(agrees, bool):
             return jsonify({'error': '"agrees" field must be a boolean (true or false)'}), 400
 
-        # Update user_feedback
         emotion_record.user_feedback = agrees
         db.session.commit()
 

@@ -13,37 +13,21 @@ class SpotifyService:
         self.spotify = spotipy.Spotify(client_credentials_manager=self.client_credentials_manager)
 
     def _get_playlist_id_for_emotion(self, emotion):
-        """Get playlist ID from database for given emotion"""
         playlist = EmotionPlaylist.get_by_emotion(emotion)
         return playlist.spotify_playlist_id if playlist else None
 
     def get_random_tracks_for_emotion(self, emotion, count=5):
-        """
-        Get random tracks from Spotify playlist for given emotion
-        Returns a list of randomly selected tracks
-
-        Args:
-            emotion: emotion name (e.g. 'happy', 'sad')
-            count: number of random tracks to return (default: 5)
-
-        Returns:
-            List of track dictionaries with keys: name, artist, spotify_id,
-            preview_url, external_url, album_image
-        """
         try:
             if not self.spotify:
                 return []
 
-            # Get playlist ID from database
             playlist_id = self._get_playlist_id_for_emotion(emotion)
 
             if not playlist_id:
                 return []
 
-            # Fetch playlist details from Spotify
             playlist = self.spotify.playlist(playlist_id)
 
-            # Get all tracks from playlist
             all_tracks = []
             for item in playlist['tracks']['items']:
                 if item['track']:
@@ -57,7 +41,6 @@ class SpotifyService:
                         'album_image': track['album']['images'][0]['url'] if track['album']['images'] else None
                     })
 
-            # Return random sample of tracks
             if len(all_tracks) <= count:
                 return all_tracks
 
