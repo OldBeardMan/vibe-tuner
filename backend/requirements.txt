@@ -10,3 +10,7 @@ python-dotenv
 tensorflow
 PyJWT
 psycopg2-binary
+
+# Testing
+pytest
+pytest-cov
